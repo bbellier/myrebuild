@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="fr"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f1d2b"><meta name="apple-mobile-web-app-capable" content="yes"><title>REBUILD</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--nuit:#0f1d2b;--nuit2:#16324a;--foret:#1f4d3a;--emer:#1f9d74;--turq:#2bb3b1;--creme:#f6f1e6;--papier:#fffdf8;--or:#c9973a;--or2:#f0d58a;--encre:#1b2a33;--gris:#6b7a80;--ligne:#e6dfcf;--rouge:#c8574d;--orange:#d9893a;--r:18px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font:15px/1.45 Manrope,system-ui,sans-serif;color:var(--encre);background:var(--creme);-webkit-tap-highlight-color:transparent}
+h1,h2,h3,h4,.serif{font-family:Fraunces,Georgia,serif;letter-spacing:-.01em;font-weight:700}
+h2{font-size:1.12rem;margin:1.5rem 0 .6rem;display:flex;align-items:center;gap:.5rem}
+h2 small,h2 .lien{font:700 .75rem Manrope;color:var(--gris);margin-left:auto}
+h4{font-size:.95rem;margin:1rem 0 .4rem}
+button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
+button:disabled{opacity:.45;cursor:not-allowed}
+input,select,textarea{font:inherit;width:100%;padding:.55rem .7rem;border:1px solid var(--ligne);border-radius:10px;background:#fff;color:var(--encre)}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--turq);border-color:transparent}
+label{font-size:.75rem;font-weight:700;color:var(--gris);display:block;margin-bottom:.2rem;text-transform:uppercase;letter-spacing:.03em}
+small{font-size:.78rem;color:var(--gris)}
+.hide{display:none!important}
+main{max-width:620px;margin:0 auto;padding:0 1rem calc(6rem + env(safe-area-inset-bottom))}
+h1.page{font-size:1.6rem;margin:1.2rem 0 .8rem}
+.carte{background:var(--papier);border:1px solid var(--ligne);border-radius:var(--r);padding:1rem;margin-bottom:.7rem}
+.lien{color:var(--emer);font-weight:700;font-size:.85rem}
+.prim{background:var(--emer);color:#fff;padding:.6rem 1.1rem;border-radius:12px;font-weight:700}
+.sec{background:#fff;border:1px solid var(--ligne);padding:.55rem 1rem;border-radius:12px;font-weight:600}
+.danger{color:var(--rouge);font-weight:700}
+.vide{color:var(--gris);font-size:.88rem;padding:.6rem 0}
+.note{font-size:.8rem;color:var(--gris);margin-top:.4rem}
+.ok{color:var(--emer);font-weight:700;font-size:.88rem;margin-top:.5rem}
+/* Jauges */
+.jauge{height:8px;border-radius:99px;background:#ebe5d6;overflow:hidden;margin:.45rem 0 .2rem}
+.jauge i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--emer),var(--turq));transition:width .8s cubic-bezier(.2,.8,.2,1)}
+.jauge.or i{background:linear-gradient(90deg,var(--or),var(--or2))}
+.jauge.temps i{background:repeating-linear-gradient(135deg,#7f9aa8 0 6px,#93adba 6px 12px)}
+/* Héros du camp de base */
+.hero{margin:0 -1rem;padding:calc(1rem + env(safe-area-inset-top)) 1.2rem 1.3rem;color:var(--creme);border-radius:0 0 28px 28px;
+  background:repeating-radial-gradient(circle at 85% 15%,rgba(255,255,255,.045) 0 1px,transparent 1px 16px),linear-gradient(155deg,var(--nuit) 0%,var(--nuit2) 55%,var(--foret) 100%)}
+.hero-haut{display:flex;align-items:center;gap:.6rem}
+.marque{font:800 .8rem Manrope;letter-spacing:.28em;color:var(--or2)}
+.hero-haut .date{margin-left:auto;font-size:.8rem;opacity:.75;text-transform:capitalize}
+.avatar{width:44px;height:44px;flex:none}
+.hero-id{margin-top:1.1rem}
+.hero-id small{color:var(--or2);font-weight:700;letter-spacing:.04em}
+.hero-id h1{font-size:1.55rem;line-height:1.15;margin:.15rem 0}
+.hero-id p{opacity:.85;font-size:.9rem}
+.hero .jauge{background:rgba(255,255,255,.14);height:10px;margin-top:1rem}
+.hero .xp{display:flex;justify-content:space-between;font-size:.78rem;opacity:.85}
+.barre{position:sticky;top:0;z-index:5;background:rgba(246,241,230,.92);backdrop-filter:blur(8px);margin:0 -1rem;padding:calc(.6rem + env(safe-area-inset-top)) 1rem .6rem;display:flex;align-items:center;gap:.6rem;border-bottom:1px solid var(--ligne)}
+.barre .marque{color:var(--foret)}
+.barre span{font-size:.8rem;font-weight:700;color:var(--gris)}
+.barre button{margin-left:auto}.barre .avatar{width:32px;height:32px}
+/* Alertes */
+.alerte{display:flex;gap:.6rem;background:#eaf4ef;border:1px solid #cfe5da;border-radius:14px;padding:.75rem .9rem;margin-top:.8rem;font-size:.88rem}
+.alerte.att{background:#fbf0e2;border-color:#f0dcc0}
+/* Quêtes */
+.quete{display:flex;gap:.75rem;align-items:center;background:var(--papier);border:1px solid var(--ligne);border-radius:16px;padding:.75rem .8rem;margin-bottom:.55rem;transition:background .3s,border-color .3s}
+.quete.finie{background:#f1f8f4;border-color:#cde6d9}
+.quete.finie b{text-decoration:line-through;text-decoration-color:rgba(31,157,116,.5)}
+.quete.reportee,.quete.suspendue{opacity:.6}
+.q-ico{width:40px;height:40px;flex:none;border-radius:12px;background:#f1ebdc;display:grid;place-items:center;font-size:1.25rem}
+.q-corps{flex:1;min-width:0;cursor:pointer}
+.q-corps b{display:block;font-size:.95rem}
+.q-corps small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.q-act{display:flex;flex-direction:column;align-items:flex-end;gap:.35rem}
+.q-act div{display:flex;gap:.3rem}
+.xp-tag{font-size:.7rem;font-weight:800;color:var(--or);background:#fbf3df;padding:.1rem .45rem;border-radius:99px}
+.valide{width:34px;height:34px;border-radius:50%;border:2px solid #cfc6b2;color:transparent;font-weight:800;transition:all .25s}
+.valide.on{background:var(--emer);border-color:var(--emer);color:#fff;transform:scale(1.05)}
+.mini{font-size:.75rem;font-weight:800;padding:.3rem .5rem;border-radius:9px;background:#eef6f2;color:var(--foret)}
+.nav-jour{display:flex;align-items:center;justify-content:space-between;margin:.4rem 0 .6rem}
+.nav-jour button{font-size:1.2rem;padding:.2rem .7rem}
+/* Segments */
+.seg{display:flex;background:#ebe4d4;border-radius:12px;padding:3px;margin-bottom:.8rem}
+.seg button{flex:1;padding:.5rem;border-radius:10px;font-weight:700;font-size:.88rem;color:var(--gris)}
+.seg button.on{background:var(--papier);color:var(--encre);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+/* Parcours (mini-carte) */
+.parcours{display:flex;justify-content:space-between;position:relative;padding:.4rem 0}
+.parcours:before{content:"";position:absolute;left:8%;right:8%;top:1.7rem;border-top:2px dashed #cdbf9f}
+.etape{position:relative;display:flex;flex-direction:column;align-items:center;width:20%;text-align:center;gap:.3rem}
+.etape span{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--papier);border:2px solid var(--ligne);font-size:1.1rem}
+.etape small{font-size:.66rem;line-height:1.2}
+.etape.c span{border-color:var(--emer);box-shadow:0 0 0 5px rgba(31,157,116,.15);background:#fff}
+.etape.c small{color:var(--encre);font-weight:800}
+.etape.v span{background:linear-gradient(135deg,var(--or),var(--or2));border-color:var(--or);color:#fff}
+.etape.l span{opacity:.55;filter:grayscale(1)}
+/* Progressions */
+.prog-l{display:flex;gap:.7rem;align-items:flex-start;padding:.55rem 0;border-bottom:1px solid var(--ligne)}
+.prog-l:last-of-type{border:0}
+.prog-l>span{font-size:1.1rem;width:1.6rem;text-align:center}
+.prog-l div{flex:1}
+.prog-l b{font-size:.9rem}
+.prog-l small{display:block}
+/* Événements */
+.evt{display:flex;gap:.75rem;align-items:center;padding:.55rem 0;border-bottom:1px solid var(--ligne);cursor:pointer;width:100%;text-align:left}
+.evt:last-child{border:0}
+.evt .cal{width:44px;flex:none;text-align:center;background:#f1ebdc;border-radius:10px;padding:.25rem 0;line-height:1.1}
+.evt .cal b{display:block;font-size:1.1rem}
+.evt .cal small{font-size:.65rem;text-transform:uppercase}
+.evt div{flex:1;min-width:0}
+.evt.fait,.evt.realise{opacity:.6}
+.evt.annule{text-decoration:line-through;opacity:.45}
+/* Récompenses */
+.recomp{display:grid;grid-template-columns:1fr 1fr;gap:.55rem}
+.recomp div{background:var(--papier);border:1px solid var(--ligne);border-radius:14px;padding:.75rem}
+.recomp b{display:block;font-size:.95rem;margin-top:.15rem}
+.badges{display:flex;flex-wrap:wrap;gap:.45rem}
+.badge{display:flex;align-items:center;gap:.4rem;padding:.35rem .65rem;border-radius:99px;background:#f1ebdc;font-size:.78rem;font-weight:700;color:var(--gris)}
+.badge.on{background:linear-gradient(135deg,#fbf0d4,#f3dea6);color:#6e5216}
+/* Chapitres (carte d'aventure) */
+.trail{position:relative;padding-left:.3rem}
+.trail:before{content:"";position:absolute;left:1.6rem;top:1rem;bottom:1rem;border-left:2px dashed #cdbf9f}
+.chapitre{position:relative;display:flex;gap:.8rem;margin-bottom:.9rem}
+.sceau{position:relative;z-index:1;width:44px;height:44px;flex:none;border-radius:50%;display:grid;place-items:center;background:var(--papier);border:2px solid var(--ligne);font:700 1.05rem Fraunces,serif}
+.chapitre.c .sceau{border-color:var(--emer);color:var(--emer);box-shadow:0 0 0 5px rgba(31,157,116,.15)}
+.chapitre.v .sceau{background:linear-gradient(135deg,var(--or),var(--or2));border-color:var(--or);color:#fff}
+.chapitre.l .ch-corps{opacity:.6}
+.ch-corps{flex:1;background:var(--papier);border:1px solid var(--ligne);border-radius:var(--r);padding:.85rem 1rem}
+.chapitre.c .ch-corps{border-color:#bfe0d1}
+.ch-tete{cursor:pointer}
+.ch-tete h3{font-size:1.1rem;margin:.1rem 0}
+.ch-tete p,.desc{font-size:.86rem;color:#41525b}
+.desc{margin:.6rem 0}
+.restr{font-size:.82rem;background:#fbf0e2;border-radius:10px;padding:.55rem .7rem;margin:.5rem 0}
+.restr b{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;color:var(--orange)}
+.mini-pal{display:flex;gap:4px;margin-top:.5rem}
+.mini-pal i{flex:1;height:5px;border-radius:9px;background:#e6dfcf}
+.mini-pal i.valide{background:var(--or)}.mini-pal i.actif{background:var(--emer)}.mini-pal i.suspendu{background:var(--orange)}
+.palier{display:flex;align-items:center;gap:.6rem;width:100%;text-align:left;padding:.55rem .6rem;border-radius:12px;background:#f7f3ea;margin-top:.4rem}
+.palier .code{font:700 .8rem Fraunces,serif;background:#fff;border:1px solid var(--ligne);border-radius:8px;padding:.15rem .4rem}
+.palier span:nth-child(2){flex:1;font-weight:600;font-size:.88rem}
+.palier.actif{background:#e8f5ef;box-shadow:inset 0 0 0 1.5px var(--emer)}
+.palier.valide .code{background:var(--or2);border-color:var(--or);color:#5c4410}
+.palier.verrouille{opacity:.6}
+.palier.suspendu{background:#fbf0e2}
+/* Critères */
+.crit{display:flex;gap:.6rem;align-items:center;width:100%;text-align:left;padding:.55rem 0;border-bottom:1px solid var(--ligne)}
+.crit span:nth-child(2){flex:1}.crit b{display:block;font-size:.88rem}.crit small{display:block}
+.crit em{font-style:normal;font-size:.72rem;font-weight:800;white-space:nowrap}
+.pastille{width:12px;height:12px;border-radius:50%;flex:none;background:#d6cfbf}
+.crit.atteint .pastille{background:var(--emer)}.crit.non_atteint .pastille{background:var(--orange)}.crit.non_applicable .pastille{background:#9fb1b8}
+.crit.atteint em{color:var(--emer)}.crit.non_atteint em{color:var(--orange)}
+.bloc-valid{background:#f3efe4;border-radius:12px;padding:.7rem .8rem;margin-top:.8rem;font-size:.85rem}
+.bloc-valid ul{margin:.3rem 0 0 1.1rem}
+/* Soins */
+.soin-tete{display:flex;gap:.7rem;align-items:center}
+.soin-tete div{flex:1}.soin-tete b{display:block}
+.prog{display:flex;justify-content:space-between;align-items:baseline;margin-top:.8rem;font-size:.85rem}
+.prog b{font:700 1.2rem Fraunces,serif}
+.slots{display:flex;flex-wrap:wrap;gap:5px;margin:.55rem 0 .2rem}
+.slot{width:18px;height:18px;border-radius:6px;background:#ebe5d6;border:1.5px solid transparent;transition:background .3s}
+.slot.realise{background:var(--emer)}.slot.oublie{background:var(--orange)}.slot.retard{border-color:var(--orange)}.slot.auj{border-color:var(--encre)}
+.recap{display:grid;grid-template-columns:repeat(4,1fr);gap:.4rem;text-align:center;margin:.6rem 0}
+.recap div{background:#f7f3ea;border-radius:12px;padding:.5rem .2rem}
+.recap b{display:block;font:700 1.25rem Fraunces,serif}
+.recap small{font-size:.68rem}
+details summary{cursor:pointer;font-size:.82rem;font-weight:700;color:var(--gris);margin-top:.6rem}
+.occ{display:flex;align-items:center;gap:.6rem;padding:.4rem 0;border-bottom:1px solid var(--ligne);font-size:.85rem}
+.occ span{flex:1}.occ.annule{opacity:.45;text-decoration:line-through}
+.chip{font-size:.7rem;font-weight:800;padding:.12rem .5rem;border-radius:99px;background:#efe9db;color:var(--gris)}
+.chip.realise,.chip.fait,.chip.terminee{background:#e2f2ea;color:var(--emer)}.chip.oublie,.chip.retard{background:#fbe9d6;color:var(--orange)}
+.acts{display:flex;gap:.5rem;align-items:center;margin-top:1rem;flex-wrap:wrap}
+.acts .sp{flex:1}
+/* Séances */
+.seance{cursor:pointer}
+.seance .ent{display:flex;justify-content:space-between;align-items:baseline}
+.seance p{font-size:.85rem;margin-top:.35rem;white-space:pre-line}
+.indic{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.45rem}
+.obj{display:flex;gap:.6rem;align-items:center;padding:.45rem 0;border-bottom:1px solid var(--ligne);font-size:.88rem}
+.obj span{flex:1;cursor:pointer}
+/* Calendrier */
+.mois{display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem}
+.mois b{font:700 1.15rem Fraunces,serif;text-transform:capitalize}
+.mois button{font-size:1.3rem;padding:.2rem .8rem}
+.grille{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.grille .js{text-align:center;font-size:.7rem;font-weight:800;color:var(--gris);padding:.2rem 0}
+.jour{aspect-ratio:1;border-radius:10px;background:var(--papier);border:1px solid var(--ligne);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:.85rem;font-weight:600}
+.jour.hors{opacity:.3}.jour.auj{border-color:var(--encre)}.jour.sel{background:var(--nuit);color:#fff;border-color:var(--nuit)}
+.points{display:flex;gap:2px;height:5px}.points i{width:5px;height:5px;border-radius:50%}
+.p-evt{background:var(--turq)}.p-soin{background:var(--rouge)}.p-seance{background:var(--emer)}.p-palier{background:var(--or)}
+.legende{display:flex;gap:.8rem;flex-wrap:wrap;font-size:.72rem;color:var(--gris);margin:.5rem 0}
+.legende i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:.25rem}
+.sem-j{margin-top:.7rem}.sem-j h4{font:800 .78rem Manrope;text-transform:uppercase;color:var(--gris);margin:.4rem 0 .1rem}
+/* Carnet */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:.4rem;text-align:center}
+.stats div{background:var(--papier);border:1px solid var(--ligne);border-radius:12px;padding:.55rem .2rem}
+.stats b{display:block;font:700 1.2rem Fraunces,serif}.stats small{font-size:.68rem}
+.tl-j{margin-top:1rem}.tl-j h4{font:800 .75rem Manrope;text-transform:uppercase;color:var(--gris);letter-spacing:.04em;margin:0 0 .3rem}
+.tl{display:flex;gap:.6rem;padding:.35rem 0;font-size:.86rem}
+.tl.or b{color:#8a6416}
+/* Dialogues */
+dialog{border:0;border-radius:22px;padding:0;width:min(560px,94vw);max-height:90vh;background:var(--papier);color:var(--encre);margin:auto}
+dialog::backdrop{background:rgba(15,29,43,.55);backdrop-filter:blur(2px)}
+dialog form,.dlg-in{padding:1.2rem}
+dialog h3{font-size:1.25rem;margin:.1rem 0 .6rem}
+.champs{display:grid;grid-template-columns:1fr 1fr;gap:.6rem .7rem}
+.champs .plein{grid-column:1/-1}
+.coche{display:flex;gap:.5rem;align-items:center;text-transform:none;font-size:.9rem;color:var(--encre);letter-spacing:0}
+.coche input{width:auto}
+.curseur{display:flex;gap:.6rem;align-items:center}.curseur output{font-weight:800;width:1.6rem;text-align:right}
+input[type=range]{padding:0;accent-color:var(--emer);border:0}
+/* Navigation basse */
+nav{position:fixed;bottom:0;left:0;right:0;z-index:10;background:rgba(255,253,248,.96);backdrop-filter:blur(10px);border-top:1px solid var(--ligne);display:flex;justify-content:center;padding:.35rem .3rem calc(.35rem + env(safe-area-inset-bottom))}
+nav button{flex:1;max-width:100px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:.66rem;font-weight:700;color:var(--gris);padding:.3rem 0;border-radius:12px}
+nav svg{width:23px;height:23px}
+nav button.on{color:var(--foret)}nav button.on svg{stroke:var(--emer)}
+/* Connexion et accueil initial */
+.ecran{min-height:100vh;display:grid;place-items:center;padding:1.5rem;color:var(--creme);
+  background:repeating-radial-gradient(circle at 80% 20%,rgba(255,255,255,.045) 0 1px,transparent 1px 16px),linear-gradient(155deg,var(--nuit),var(--nuit2) 55%,var(--foret))}
+.ecran form{width:min(400px,100%);background:var(--papier);color:var(--encre);border-radius:24px;padding:1.5rem;display:grid;gap:.7rem}
+.ecran .titre{text-align:center;margin-bottom:1rem}
+.ecran .titre .marque{font-size:1.3rem;display:block;margin:.6rem 0 .2rem}
+.ecran .titre p{opacity:.8;font-size:.9rem}
+.err{color:var(--rouge);font-size:.85rem;min-height:1em}
+/* Animations : XP, célébrations, notifications */
+.xp-pop{position:fixed;z-index:50;pointer-events:none;font:800 1rem Manrope;color:var(--or);text-shadow:0 1px 0 #fff;animation:monte 1.1s ease-out forwards}
+@keyframes monte{0%{opacity:0;transform:translate(-50%,0) scale(.8)}20%{opacity:1;transform:translate(-50%,-12px) scale(1.1)}100%{opacity:0;transform:translate(-50%,-60px)}}
+.fete{position:fixed;inset:0;z-index:40;display:grid;place-items:center;background:rgba(15,29,43,.9);backdrop-filter:blur(6px);animation:fondu .3s}
+.fete-in{text-align:center;color:var(--creme);padding:2rem;animation:pop .5s cubic-bezier(.2,1.4,.4,1)}
+.fete-in .sceau-or{width:92px;height:92px;margin:0 auto 1rem;border-radius:50%;display:grid;place-items:center;font-size:2.4rem;color:#fff;background:linear-gradient(135deg,var(--or),var(--or2));box-shadow:0 0 0 10px rgba(240,213,138,.18),0 0 60px rgba(240,213,138,.55)}
+.fete-in h2{font-size:2rem;justify-content:center;margin:.3rem 0 1.2rem}
+.fete-in small{color:var(--or2);font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+@keyframes pop{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
+@keyframes fondu{from{opacity:0}}
+.toast{position:fixed;left:50%;bottom:calc(5.5rem + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:60;background:var(--nuit);color:#fff;padding:.65rem 1rem;border-radius:12px;font-size:.88rem;font-weight:600;max-width:90vw;animation:fondu .3s}
+.toast.err{background:var(--rouge)}
+.calme *,.calme *:before,.calme *:after{animation:none!important;transition:none!important}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (min-width:700px){.hero{margin:0;border-radius:0 0 28px 28px}}
+</style>
+</head>
+<body>
+
+<!-- ===== Connexion ===== -->
+<section id="login" class="ecran hide"><div>
+  <div class="titre"><svg class="avatar" style="width:64px;height:64px" viewBox="0 0 48 48"><use href="#av"/></svg><span class="marque">REBUILD</span><p>Ta reconstruction, chapitre par chapitre.</p></div>
+  <form id="f-login"><div><label>Email</label><input id="l-mail" type="email" required autocomplete="username"></div>
+    <div><label>Mot de passe</label><input id="l-mdp" type="password" required autocomplete="current-password"></div>
+    <p class="err" id="l-err"></p><button class="prim">Entrer au camp de base</button></form>
+</div></section>
+
+<!-- ===== Création du parcours (premier lancement) ===== -->
+<section id="init" class="ecran hide"><div>
+  <div class="titre"><span class="marque">REBUILD</span><p>Crée ton carnet d'aventurier.</p></div>
+  <form id="f-init">
+    <div><label>Prénom</label><input id="i-prenom"></div>
+    <div><label>Date de l'opération</label><input id="i-date" type="date" required></div>
+    <div><label>Sport pratiqué</label><input id="i-sport" placeholder="Triathlon, football…"></div>
+    <label class="coche"><input type="checkbox" id="i-inj" checked> Injections anticoagulantes : 1 par jour pendant 14 jours</label>
+    <div><label>Première injection (vide = jour de l'opération)</label><input id="i-inj-d" type="date"></div>
+    <p class="note">Les phases, paliers, critères et quêtes créés sont des exemples issus du protocole : ils restent modifiables et doivent être validés avec ton kiné.</p>
+    <p class="err" id="i-err"></p><button class="prim">Commencer l'aventure</button></form>
+</div></section>
+
+<!-- ===== Application ===== -->
+<div id="app" class="hide">
+  <main><div id="barre" class="barre hide"></div><div id="vue"></div>
+    <p class="note" style="text-align:center;margin-top:2rem">REBUILD organise ton suivi : il ne remplace ni ne modifie l'avis de ton kiné ou de ton médecin.</p></main>
+  <nav id="nav"></nav>
+</div>
+<dialog id="dlg"></dialog>
+
+<!-- Avatar d'explorateur (dessin original) -->
+<svg width="0" height="0" style="position:absolute"><symbol id="av" viewBox="0 0 48 48">
+  <circle cx="24" cy="24" r="22.5" fill="#16324a" stroke="#c9973a" stroke-width="2"/><path d="M5 35 17 19l7 9 6-7 13 14a22 22 0 0 1-38 0Z" fill="#1f9d74"/>
+  <path d="m17 19 3.2 4.2-3.2-1.2-3 1.4Z" fill="#f6f1e6"/><path d="m33 8 1.7 4.6 4.6 1.7-4.6 1.7L33 20.6l-1.7-4.6-4.6-1.7 4.6-1.7Z" fill="#f0d58a"/></symbol></svg>
+
+<script>
+// ===== Configuration Supabase (Project Settings > API) =====
+const SUPABASE_URL = "https://lwjscmwllqcwaiohyuzk.supabase.co";
+const SUPABASE_KEY = "sb_publishable_L7_VSrn0ipQCTuHh1LyF7g_5exHVB0s";
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ===== Utilitaires =====
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const iso = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+const auj = () => iso(new Date());
+const addJ = (s, n) => { const d = new Date(s + "T12:00"); d.setDate(d.getDate() + n); return iso(d); };
+const ecart = (a, b) => Math.round((new Date(b + "T12:00") - new Date(a + "T12:00")) / 864e5);
+const fmt = (s, o = {day:"numeric", month:"short"}) => s ? new Date(String(s).slice(0, 10) + "T12:00").toLocaleDateString("fr-FR", o) : "";
+const LONG = {weekday:"long", day:"numeric", month:"long"};
+const nb = n => (+n || 0).toLocaleString("fr-FR", {maximumFractionDigits:1});
+const hh = h => h ? h.slice(0, 5) : "";
+const pct = (a, b) => b ? Math.min(100, Math.round(a / b * 100)) : 0;
+const ok = r => { if (r.error) { toast("Erreur : " + r.error.message, true); throw r.error; } return r.data; };
+const toast = (m, err) => { const t = document.createElement("div"); t.className = "toast" + (err ? " err" : ""); t.textContent = m; document.body.append(t); setTimeout(() => t.remove(), 3800); };
+const AV = (c = "avatar") => `<svg class="${c}" viewBox="0 0 48 48"><use href="#av"/></svg>`;
+
+// ===== Libellés =====
+const L = {
+  cat: {medicale:"Médicale", physique:"Physique", administrative:"Administrative", suivi:"Suivi", recuperation:"Récupération"},
+  soin: {injection:["💉","Injection"], pansement:["🩹","Pansement"], prise_sang:["🩸","Prise de sang"], autre:["⚕️","Autre soin"]},
+  nomSoin: {injection:"Injections anticoagulantes", pansement:"Pansements", prise_sang:"Prises de sang", autre:"Soin"},
+  occ: {prevu:"Prévu", realise:"Réalisé", oublie:"Oubli signalé", annule:"Annulé"},
+  crit: {non_evalue:"Non évalué", non_atteint:"Non atteint", atteint:"Atteint", non_applicable:"Non applicable"},
+  pal: {verrouille:"Verrouillé", actif:"En cours", suspendu:"Suspendu", valide:"Validé"},
+  cap: {force:"Force", endurance:"Endurance", stabilite:"Stabilité", controle:"Contrôle moteur", mobilite:"Mobilité", conditionnement:"Conditionnement général", athletique:"Capacités athlétiques", sport:"Spécifique au sport"},
+  evt: {kine:["🦵","Kiné"], infirmier:["🩺","Infirmier"], prise_sang:["🩸","Prise de sang"], consultation:["👨‍⚕️","Consultation"], physique:["🏋️","Préparation physique"], evaluation:["📋","Évaluation clinique"], recuperation:["🌙","Récupération"], autre:["📌","Autre"]},
+  qst: {en_cours:"En cours", terminee:"Terminée", reportee:"Reportée", suspendue:"Suspendue"},
+  mes: {flexion:["Flexion","°"], extension:["Extension","°"], perimetre:["Périmètre du genou","cm"], douleur:["Douleur","/10"], force:["Force","kg"], autre:["Autre",""]},
+  src: {patient:"Saisie patient", kine:"Validation professionnelle"},
+  tab: {phases:"Chapitre", paliers:"Palier", criteres:"Critère", soins:"Prescription de soin", objectifs_physiques:"Objectif physique", quetes:"Quête"},
+  act: {insert:"création", update:"modification", delete:"suppression"}
+};
+const opts = o => Object.entries(o).map(([k, v]) => [k, Array.isArray(v) ? v[1] : v]);
+const ICO_PHASE = ["🌱","🌊","🏗️","⛰️","🏁"];
+const TITRES = ["Recrue","Éclaireur","Pisteur","Explorateur","Aventurier","Cartographe","Pionnier","Vétéran","Légende"];
+
+// ===== État =====
+let D = {}, U = {tab:"camp", segQ:"quetes", segS:"kine", vueA:"mois", jq:auj(), jour:auj(), mois:auj().slice(0, 8) + "01", ouvert:null}, W = {}, PT = {x:innerWidth / 2, y:innerHeight / 2};
+document.addEventListener("pointerdown", e => PT = {x:e.clientX, y:e.clientY}, true);
+
+// ===== Chargement des données =====
+const TABLES = {phases:"numero", paliers:"ordre", criteres:"nom", mesures:"date", soins:"date_debut", soin_occurrences:"date_prevue", quetes:"created_at", seances:"date", objectifs_physiques:"capacite", evenements:"date", journal:"date", bareme:"source"};
+const charger = async () => {
+  const r = await Promise.all([sb.from("profils").select("*").maybeSingle(), sb.rpc("rb_xp_total"), sb.from("xp").select("*").order("id", {ascending:false}).limit(30),
+    sb.from("quete_jours").select("*").gte("date", addJ(auj(), -120)), ...Object.entries(TABLES).map(([t, o]) => sb.from(t).select("*").order(o))]);
+  r.forEach(ok);
+  [D.profil, D.xpTotal, D.xp, D.quete_jours] = r.slice(0, 4).map(x => x.data);
+  Object.keys(TABLES).forEach((t, i) => D[t] = r[i + 4].data);
+  D.xpTotal = +D.xpTotal || 0;
+};
+
+// ===== Calculs : quatre progressions indépendantes =====
+const jPost = () => ecart(D.profil.date_operation, auj());
+const phase = id => D.phases.find(p => p.id === id);
+const phaseTemp = j => D.phases.find(p => j >= p.debut_jour && (p.fin_jour == null || j <= p.fin_jour)) || D.phases[j < 0 ? 0 : D.phases.length - 1];
+const palActif = () => D.paliers.find(p => ["actif","suspendu"].includes(p.statut));
+const phaseClin = () => { const p = palActif(); return p ? phase(p.phase_id) : D.paliers.length && D.paliers.every(x => x.statut === "valide") ? D.phases.at(-1) : D.phases[0]; };
+const palDe = ph => D.paliers.filter(p => p.phase_id === ph.id);
+const phaseValidee = ph => { const p = palDe(ph); return p.length > 0 && p.every(x => x.statut === "valide"); };
+const critsDe = p => D.criteres.filter(c => c.palier_id === p.id);
+const critOK = c => ["atteint","non_applicable"].includes(c.statut);
+// Conditions de passage : jamais le temps seul, jamais les XP
+const blocages = p => [p.statut !== "actif" && "le palier doit être le palier actif (non suspendu)", p.date_min && p.date_min > auj() && `date minimale : ${fmt(p.date_min, LONG)}`,
+  ...critsDe(p).filter(c => c.obligatoire && !critOK(c)).map(c => `critère « ${c.nom} » : ${L.crit[c.statut].toLowerCase()}`)].filter(Boolean);
+const niveau = x => { let n = 1, s = 0, b = 100; while (x >= s + b) { s += b; n++; b = 100 + 25 * (n - 1); } return {n, dans:x - s, besoin:b}; };
+const titre = n => TITRES[Math.min(Math.floor(n / 4), TITRES.length - 1)];
+const soin = id => D.soins.find(s => s.id === id);
+const occ = id => D.soin_occurrences.find(o => o.id === id);
+const occDe = (s, tout) => D.soin_occurrences.filter(o => o.soin_id === s.id && (tout || o.statut !== "annule"));
+const pts = src => D.bareme.find(b => b.source === src)?.points ?? 10;
+const quete = id => D.quetes.find(q => q.id === id);
+const qActives = d => D.quetes.filter(q => q.actif && q.date_debut <= d && (!q.date_fin || q.date_fin >= d));
+const qj = (q, d) => D.quete_jours.find(x => x.quete_id === q.id && x.date === d);
+const pas = q => q.unite === "min" ? 5 : q.cible >= 10 ? Math.round(q.cible / 5) : 1;
+const serie = () => { const s = new Set(D.quete_jours.filter(x => x.statut === "terminee").map(x => x.date)); let d = s.has(auj()) ? auj() : addJ(auj(), -1), n = 0; while (s.has(d)) { n++; d = addJ(d, -1); } return n; };
+// Badges : ils valorisent la régularité et le suivi, pas la vitesse de guérison
+const BADGES = [
+  ["Premiers pas","🥾","Documenter une première action", () => D.xpTotal > 0],
+  ["Premier bilan","📋","Faire évaluer un premier critère", () => D.criteres.some(c => c.statut !== "non_evalue")],
+  ["Première semaine de suivi","📓","Remplir 7 journaux", () => D.journal.length >= 7],
+  ["Régularité","🔥","7 jours de quêtes d'affilée", () => serie() >= 7],
+  ["Soins documentés","💉","Documenter entièrement un programme de soins", () => D.soins.some(s => { const o = occDe(s); return o.length && o.every(x => x.statut === "realise"); })],
+  ["Première compétence validée","✅","Premier critère atteint", () => D.criteres.some(c => c.statut === "atteint")],
+  ["Premier palier franchi","🏅","Premier palier validé par le kiné", () => D.paliers.some(p => p.statut === "valide")],
+  ["Dix séances enregistrées","🔟","Enregistrer 10 séances", () => D.seances.length >= 10],
+  ["Premier chapitre terminé","🏆","Terminer un chapitre", () => D.phases.some(phaseValidee)],
+  ["Trente jours de suivi","🌙","Remplir 30 journaux", () => D.journal.length >= 30]];
+const badgesObtenus = () => BADGES.filter(b => b[3]());
+
+// ===== Jauges animées (remplissage depuis la valeur précédente) =====
+const jauge = (k, p, cls = "") => `<div class="jauge ${cls}"><i data-k="${k}" data-w="${p}" style="width:${W[k] ?? 0}%"></i></div>`;
+const animerJauges = () => requestAnimationFrame(() => requestAnimationFrame(() => $$("[data-w]").forEach(i => { i.style.width = i.dataset.w + "%"; W[i.dataset.k] = i.dataset.w; })));
+
+// ===== Rendu général =====
+const NAV = [["camp","Camp","M3 20h18M12 4 4 20M12 4l8 16M12 9v11"], ["aventure","Aventure","M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2ZM9 4v14M15 6v14"], ["quetes","Quêtes","M5 21V4h11l-2 4 2 4H5"],
+  ["seances","Séances","M6 7v10M3 9v6M18 7v10M21 9v6M6 12h12"], ["agenda","Agenda","M3 5h18v16H3zM3 10h18M8 3v4M16 3v4"], ["carnet","Carnet","M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3ZM5 17a3 3 0 0 1 3-3h11"]];
+$("#nav").innerHTML = NAV.map(([k, t, d]) => `<button data-a="tab" data-id="${k}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="${d}"/></svg>${t}</button>`).join("");
+const rendre = () => {
+  document.body.classList.toggle("calme", D.profil.animations === false);
+  $$("nav button").forEach(b => b.classList.toggle("on", b.dataset.id === U.tab));
+  const j = jPost(), nv = niveau(D.xpTotal);
+  $("#barre").classList.toggle("hide", U.tab === "camp");
+  $("#barre").innerHTML = `<span class="marque">REBUILD</span><span>${j >= 0 ? "J+" + j : "J" + j}</span><span>Niv. ${nv.n}</span><button data-a="reglages">${AV()}</button>`;
+  $("#vue").innerHTML = VUES[U.tab](); animerJauges();
+};
+// Rechargement + détection des récompenses (XP, niveau, badges)
+const maj = async () => {
+  const av = {x:D.xpTotal, n:niveau(D.xpTotal).n, b:badgesObtenus().map(b => b[0])};
+  await charger(); rendre();
+  if (D.xpTotal > av.x) xpPop(D.xpTotal - av.x);
+  const n = niveau(D.xpTotal).n; if (n > av.n) celebrer(`Niveau ${n}`, `${titre(n)} — nouveau niveau`, "✦");
+  badgesObtenus().filter(b => !av.b.includes(b[0])).forEach(b => toast(`${b[1]} Badge obtenu : ${b[0]}`));
+};
+const xpPop = n => { const s = document.createElement("div"); s.className = "xp-pop"; s.textContent = `+${n} XP`; s.style.left = PT.x + "px"; s.style.top = PT.y - 20 + "px"; document.body.append(s); setTimeout(() => s.remove(), 1200); };
+const celebrer = (t, s, ico) => { const f = document.createElement("div"); f.className = "fete"; f.innerHTML = `<div class="fete-in"><div class="sceau-or">${ico}</div><small>${esc(s)}</small><h2>${esc(t)}</h2><button class="prim">Continuer</button></div>`; f.onclick = () => f.remove(); document.body.append(f); };
+
+// ===== Blocs réutilisables =====
+const alertes = () => {
+  const j = jPost(), pt = phaseTemp(j), pc = phaseClin(), pa = palActif(), out = [];
+  if (pa && pt.numero > pc.numero) { const n = critsDe(pa).filter(c => c.obligatoire && !critOK(c)).length;
+    out.push(["🧭", `Tu es dans la période indicative de la phase ${pt.numero}. ${n === 0 ? "Les critères du palier " + pa.code + " sont remplis : la validation revient à ton kiné." : n === 1 ? "Ton dernier critère clinique reste à évaluer avant le passage au chapitre suivant." : `${n} critères cliniques restent à évaluer avant le passage au chapitre suivant.`} Le programme actuellement autorisé reste actif.`]); }
+  if (pa?.statut === "suspendu") out.push(["⏸️", `Le palier ${pa.code} est suspendu. Prends le temps qu'il faut : ta progression joueur continue.`, "att"]);
+  const n = D.soin_occurrences.filter(o => o.statut === "prevu" && o.date_prevue < auj()).length;
+  if (n) out.push(["🩹", `${n} soin${n > 1 ? "s" : ""} passé${n > 1 ? "s" : ""} non documenté${n > 1 ? "s" : ""} : indique s'il a été réalisé ou oublié.`, "att"]);
+  return out.map(([i, t, c]) => `<div class="alerte ${c || ""}"><span>${i}</span><span>${t}</span></div>`).join("");
+};
+const ligneEvt = x => `<button class="evt ${x.etat || ""}" data-a="${x.a}" data-id="${x.id}"><span class="cal"><b>${new Date(x.d + "T12:00").getDate()}</b><small>${fmt(x.d, {month:"short"})}</small></span>
+  <div><b>${x.ic} ${esc(x.t)}</b><small style="display:block">${esc(x.s || "")}</small></div><small>${hh(x.h)}</small></button>`;
+
+// ----- Cartes de quêtes (quêtes, soins, rendez-vous et journal du jour) -----
+const carteQuete = (q, d) => {
+  const x = qj(q, d) || {valeur:0, statut:"en_cours"}, fini = x.statut === "terminee", id = `${q.id}|${d}`;
+  return `<div class="quete ${fini ? "finie" : ""} ${x.statut}"><div class="q-ico">${q.icone || "🧭"}</div>
+    <div class="q-corps" data-a="qDetail" data-id="${id}"><b>${esc(q.titre)}</b><small>${esc(q.description || L.cat[q.categorie])}</small>
+    ${jauge("q" + id, pct(x.valeur, q.cible), fini ? "or" : "")}<small>${nb(x.valeur)} / ${nb(q.cible)} ${esc(q.unite)}${x.statut !== "en_cours" && !fini ? " · " + L.qst[x.statut].toLowerCase() : ""}</small></div>
+    <div class="q-act"><span class="xp-tag">+${q.xp} XP</span><div>${q.cible > 1 && !fini ? `<button class="mini" data-a="qPlus" data-id="${id}">+${pas(q)}</button>` : ""}
+    <button class="valide ${fini ? "on" : ""}" data-a="qFin" data-id="${id}" aria-label="Valider">✓</button></div></div></div>`;
+};
+const carteOcc = o => {
+  const s = soin(o.soin_id), l = occDe(s), f = o.statut === "realise", r = l.filter(x => x.statut === "realise").length;
+  return `<div class="quete ${f ? "finie" : ""}"><div class="q-ico">${L.soin[s.type][0]}</div>
+    <div class="q-corps" data-a="occMenu" data-id="${o.id}"><b>${esc(s.nom)}</b><small>${l.indexOf(o) + 1}e sur ${l.length}${o.heure_prevue ? " · " + hh(o.heure_prevue) : ""}${o.statut === "oublie" ? " · oubli signalé" : ""}</small>
+    ${jauge("s" + s.id, pct(r, l.length), r === l.length ? "or" : "")}<small>Progression : ${r} / ${l.length}</small></div>
+    <div class="q-act"><span class="xp-tag">+${pts(s.type === "autre" ? "soin" : s.type)} XP</span><button class="valide ${f ? "on" : ""}" data-a="occToggle" data-id="${o.id}" aria-label="Valider">✓</button></div></div>`;
+};
+const quetesDuJour = d => {
+  const e = D.evenements.filter(x => x.date === d && x.statut !== "annule"), o = D.soin_occurrences.filter(x => x.date_prevue === d && x.statut !== "annule"), jn = D.journal.find(x => x.date === d);
+  return e.map(x => `<div class="quete ${x.statut === "fait" ? "finie" : ""}"><div class="q-ico">${L.evt[x.type][0]}</div><div class="q-corps" data-a="evtEdit" data-id="${x.id}"><b>${esc(x.titre)}</b><small>${[hh(x.heure), x.lieu, x.professionnel].filter(Boolean).map(esc).join(" · ") || "Rendez-vous"}</small></div>
+      <div class="q-act"><button class="valide ${x.statut === "fait" ? "on" : ""}" data-a="evtToggle" data-id="${x.id}">✓</button></div></div>`).join("")
+    + o.map(carteOcc).join("") + qActives(d).map(q => carteQuete(q, d)).join("")
+    + `<div class="quete ${jn ? "finie" : ""}"><div class="q-ico">📓</div><div class="q-corps" data-a="journal" data-id="${d}"><b>Journal de récupération</b><small>${jn ? `Douleur ${jn.douleur ?? "–"}/10 · confiance ${jn.confiance ?? "–"}/10` : "Douleur, gonflement, fatigue, ressenti"}</small></div>
+      <div class="q-act"><span class="xp-tag">+${pts("journal")} XP</span><button class="valide ${jn ? "on" : ""}" data-a="journal" data-id="${d}">✓</button></div></div>`;
+};
+
+// ===== Vues =====
+const VUES = {};
+VUES.camp = () => {
+  const j = jPost(), pt = phaseTemp(j), pc = phaseClin(), pa = palActif(), nv = niveau(D.xpTotal), cr = pa ? critsDe(pa) : [], ob = D.objectifs_physiques.filter(o => o.phase_id === pc.id);
+  const lt = j < 0 ? ["Opération dans " + -j + " jour" + (j < -1 ? "s" : ""), 0] : pt.fin_jour == null ? [`Période indicative phase ${pt.numero} · ouverte depuis J+${pt.debut_jour}`, 100] : [`Période indicative phase ${pt.numero} · jour ${j - pt.debut_jour + 1} sur ${pt.fin_jour - pt.debut_jour + 1}`, pct(j - pt.debut_jour + 1, pt.fin_jour - pt.debut_jour + 1)];
+  const bo = badgesObtenus(), suiv = BADGES.find(b => !b[3]()), aFaire = D.soin_occurrences.filter(o => o.date_prevue === auj() && o.statut === "prevu").length + qActives(auj()).filter(q => qj(q, auj())?.statut !== "terminee").length + (D.journal.some(x => x.date === auj()) ? 0 : 1);
+  const ev = [...D.evenements.filter(e => e.statut === "prevu" && e.date >= auj()).map(e => ({d:e.date, h:e.heure, ic:L.evt[e.type][0], t:e.titre, s:[L.evt[e.type][1], e.lieu, e.professionnel].filter(Boolean).join(" · "), a:"evtEdit", id:e.id})),
+    ...D.soins.flatMap(s => { const o = occDe(s).find(o => o.statut === "prevu" && o.date_prevue > auj()); return o ? [{d:o.date_prevue, h:o.heure_prevue, ic:L.soin[s.type][0], t:s.nom, s:"Prochain soin", a:"occMenu", id:o.id}] : []; })]
+    .sort((a, b) => (a.d + (a.h || "")).localeCompare(b.d + (b.h || ""))).slice(0, 4);
+  return `<section class="hero"><div class="hero-haut"><span class="marque">REBUILD</span><span class="date">${new Date().toLocaleDateString("fr-FR", LONG)}</span><button data-a="reglages" aria-label="Réglages">${AV()}</button></div>
+    <div class="hero-id"><small>${titre(nv.n)} — Niveau ${nv.n}${D.profil.prenom ? " · " + esc(D.profil.prenom) : ""}</small><h1>Chapitre ${pc.numero} : ${esc(pc.nom)}</h1>
+    <p>${j >= 0 ? `J+${j} — Semaine ${Math.floor(j / 7) + 1} postopératoire · mois ${Math.floor(j / 30.44) + 1}` : `Opération dans ${-j} jour${j < -1 ? "s" : ""}`}</p></div>
+    ${jauge("xp", pct(nv.dans, nv.besoin), "or")}<div class="xp"><span>XP : ${nb(nv.dans)} / ${nb(nv.besoin)}</span><span>Total ${nb(D.xpTotal)} XP</span></div></section>
+  ${alertes()}
+  <h2>Mes quêtes du jour <small>${aFaire ? aFaire + " à faire" : "Tout est fait ✦"}</small></h2>${quetesDuJour(auj())}
+  <h2>Mon parcours <button class="lien" data-a="tab" data-id="aventure">Voir la carte</button></h2>
+  <div class="carte"><div class="parcours">${D.phases.map(ph => { const v = phaseValidee(ph), c = ph.id === pc.id, l = !v && !c && ph.numero > pc.numero;
+    return `<button class="etape ${v ? "v" : c ? "c" : l ? "l" : ""}" data-a="tab" data-id="aventure"><span>${v ? "✦" : l ? "🔒" : ICO_PHASE[ph.numero - 1] || ph.numero}</span><small>${ph.numero}. ${esc(ph.nom)}</small></button>`; }).join("")}</div></div>
+  <h2>Mes progressions</h2><div class="carte">
+    <div class="prog-l"><span>⏳</span><div><b>Temps postopératoire</b><small>${lt[0]}</small>${jauge("pt", lt[1], "temps")}</div></div>
+    <div class="prog-l"><span>🩺</span><div><b>Clinique</b><small>${pa ? `Palier ${pa.code} · ${cr.filter(critOK).length} / ${cr.length} critères validés` : "Tous les paliers sont validés"}</small>${jauge("pc", pa ? pct(cr.filter(critOK).length, cr.length) : 100)}</div></div>
+    <div class="prog-l"><span>🏋️</span><div><b>Préparation physique</b><small>${ob.filter(o => o.valide).length} / ${ob.length} objectifs validés · chapitre ${pc.numero}</small>${jauge("pp", pct(ob.filter(o => o.valide).length, ob.length))}</div></div>
+    <div class="prog-l"><span>✦</span><div><b>Aventure</b><small>Niveau ${nv.n} · ${nb(nv.dans)} / ${nb(nv.besoin)} XP</small>${jauge("pa", pct(nv.dans, nv.besoin), "or")}</div></div>
+    <p class="note">La barre de temps indique le temps écoulé dans la période indicative, jamais un pourcentage de guérison.</p></div>
+  <h2>Prochains événements <button class="lien" data-a="evtEdit" data-id="new">+ Ajouter</button></h2>
+  <div class="carte">${ev.map(ligneEvt).join("") || `<p class="vide">Aucun événement à venir.</p>`}</div>
+  <h2>Récompenses</h2><div class="recomp">
+    <div><small>Dernier badge</small><b>${bo.length ? bo.at(-1)[1] + " " + bo.at(-1)[0] : "—"}</b></div><div><small>Niveau</small><b>${nv.n} · ${titre(nv.n)}</b></div>
+    <div><small>Prochain succès</small><b>${suiv ? suiv[1] + " " + suiv[0] : "Tous obtenus ✦"}</b>${suiv ? `<small>${suiv[2]}</small>` : ""}</div><div><small>Chapitres validés</small><b>${D.phases.filter(phaseValidee).length} / ${D.phases.length}</b></div></div>`;
+};
+
+VUES.aventure = () => {
+  const pc = phaseClin(), last = {};
+  D.mesures.forEach(m => last[m.type] = m);
+  return `<h1 class="page">Mon aventure</h1>${alertes()}<div class="trail" style="margin-top:1rem">${D.phases.map(ph => {
+    const v = phaseValidee(ph), c = ph.id === pc.id, l = !v && !c && ph.numero > pc.numero, o = U.ouvert == null ? c : U.ouvert === ph.id;
+    return `<article class="chapitre ${v ? "v" : c ? "c" : l ? "l" : ""}"><div class="sceau">${v ? "✦" : l ? "🔒" : ph.numero}</div><div class="ch-corps">
+      <div class="ch-tete" data-a="chapitre" data-id="${ph.id}"><small>Chapitre ${ph.numero} · J+${ph.debut_jour}${ph.fin_jour != null ? " → J+" + ph.fin_jour : " et après"} (indicatif)</small><h3>${ICO_PHASE[ph.numero - 1] || ""} ${esc(ph.nom)}</h3><p>${esc(ph.objectif)}</p></div>
+      ${o ? `<p class="desc">${esc(ph.description)}</p>${ph.restrictions ? `<div class="restr"><b>Restrictions</b>${esc(ph.restrictions)}</div>` : ""}
+        ${palDe(ph).map(p => { const cr = critsDe(p); return `<button class="palier ${p.statut}" data-a="palier" data-id="${p.id}"><span class="code">${p.code}</span><span>${esc(p.nom)}${p.prolonge ? " · prolongé" : ""}</span><small>${cr.length ? cr.filter(critOK).length + "/" + cr.length + " · " : ""}${L.pal[p.statut]}</small></button>`; }).join("")}
+        <div class="acts" style="margin-top:.6rem"><button class="lien" data-a="phaseEdit" data-id="${ph.id}">✎ Modifier le chapitre</button></div>`
+      : `<div class="mini-pal">${palDe(ph).map(p => `<i class="${p.statut}"></i>`).join("")}</div>`}</div></article>`; }).join("")}</div>
+  <h2>Suivi clinique <button class="lien" data-a="mesure" data-id="new">+ Mesure</button></h2>
+  <div class="carte"><div class="recap" style="grid-template-columns:repeat(3,1fr);margin-top:0">${["flexion","extension","perimetre"].map(t => `<div><b>${last[t] ? nb(last[t].valeur) + (last[t].unite || "") : "—"}</b><small>${L.mes[t][0]}${last[t] ? " · " + fmt(last[t].date) : ""}</small></div>`).join("")}</div>
+    ${D.mesures.slice(-8).reverse().map(m => `<div class="occ" data-a="mesure" data-id="${m.id}" style="cursor:pointer"><span>${esc(L.mes[m.type]?.[0] || m.type)} · <b>${nb(m.valeur)} ${esc(m.unite || "")}</b>${m.methode ? " · " + esc(m.methode) : ""}</span><span class="chip ${m.source === "kine" ? "fait" : ""}">${m.source === "kine" ? "kiné" : "patient"}</span><small>${fmt(m.date)}</small></div>`).join("") || `<p class="vide">Aucune mesure enregistrée.</p>`}</div>`;
+};
+
+VUES.quetes = () => `<h1 class="page">Mes quêtes</h1><div class="seg">${[["quetes","Quêtes"],["soins","Soins"]].map(([v, t]) => `<button class="${U.segQ === v ? "on" : ""}" data-a="seg" data-id="segQ:${v}">${t}</button>`).join("")}</div>${U.segQ === "quetes" ? vueQuetes() : vueSoins()}`;
+const vueQuetes = () => {
+  const d = U.jq, g = {actives:[], avenir:[], finies:[]};
+  D.quetes.forEach(q => (q.date_debut > auj() ? g.avenir : !q.actif || (q.date_fin && q.date_fin < auj()) ? g.finies : g.actives).push(q));
+  const ligne = q => `<div class="obj"><span data-a="queteEdit" data-id="${q.id}">${q.icone} <b>${esc(q.titre)}</b><small style="display:block">${nb(q.cible)} ${esc(q.unite)} · ${L.cat[q.categorie]} · ${fmt(q.date_debut)}${q.date_fin ? " → " + fmt(q.date_fin) : " → sans fin"}</small></span><span class="xp-tag">+${q.xp} XP</span></div>`;
+  return `<div class="nav-jour"><button data-a="jq" data-id="-1">‹</button><b class="serif">${d === auj() ? "Aujourd'hui" : fmt(d, LONG)}</b><button data-a="jq" data-id="1" ${d >= auj() ? "disabled" : ""}>›</button></div>
+    ${quetesDuJour(d)}<h2>Modèles de quêtes <button class="lien" data-a="queteEdit" data-id="new">+ Nouvelle quête</button></h2>
+    <div class="carte">${g.actives.map(ligne).join("") || `<p class="vide">Aucune quête active.</p>`}
+    ${g.avenir.length ? `<h4>À venir</h4>${g.avenir.map(ligne).join("")}` : ""}${g.finies.length ? `<details><summary>Terminées ou désactivées (${g.finies.length})</summary>${g.finies.map(ligne).join("")}</details>` : ""}</div>
+    <p class="note">Les objectifs des quêtes sont des exemples de configuration à valider par ton kiné : ils ne constituent pas une prescription.</p>`;
+};
+const vueSoins = () => {
+  const a = auj(), o = D.soin_occurrences.filter(x => x.statut !== "annule"), r = o.filter(x => x.statut === "realise").length;
+  return `<div class="carte"><b class="serif">Soins postopératoires</b><div class="recap">
+    <div><b>${o.filter(x => x.date_prevue === a).length}</b><small>Aujourd'hui</small></div><div><b>${o.filter(x => x.date_prevue > a && x.statut === "prevu").length}</b><small>À venir</small></div>
+    <div><b>${r}</b><small>Réalisés</small></div><div><b>${o.filter(x => x.date_prevue < a && x.statut === "prevu").length}</b><small>En attente</small></div></div>
+    <div class="prog"><span>Soins réalisés / planifiés</span><b>${r} / ${o.length}</b></div>${jauge("sg", pct(r, o.length))}</div>
+  ${D.soins.map(s => { const l = occDe(s), t = occDe(s, true), n = l.filter(x => x.statut === "realise").length;
+    return `<div class="carte"><div class="soin-tete"><span class="q-ico">${L.soin[s.type][0]}</span><div><b>${esc(s.nom)}</b><small>${s.frequence_jours === 1 ? "Tous les jours" : `Tous les ${s.frequence_jours} jours`} · depuis le ${fmt(s.date_debut)}${hh(s.heure) ? " · " + hh(s.heure) : ""}${s.actif ? "" : " · arrêté"}</small></div><button class="lien" data-a="soinEdit" data-id="${s.id}">✎ Modifier</button></div>
+      <div class="prog"><span>Progression</span><b>${n} / ${l.length}</b></div>${jauge("s" + s.id, pct(n, l.length), n === l.length && l.length ? "or" : "")}
+      <div class="slots">${l.map(x => `<button class="slot ${x.statut}${x.date_prevue === a ? " auj" : ""}${x.statut === "prevu" && x.date_prevue < a ? " retard" : ""}" title="${fmt(x.date_prevue)} · ${L.occ[x.statut]}" data-a="occMenu" data-id="${x.id}"></button>`).join("")}</div>
+      ${n === l.length && l.length ? `<p class="ok">✦ Programme de soins documenté : ${n}/${l.length}</p>` : ""}${s.note ? `<p class="note">${esc(s.note)}</p>` : ""}
+      <details><summary>Détail des ${t.length} occurrences</summary>${t.map(x => `<div class="occ ${x.statut}"><span data-a="occMenu" data-id="${x.id}" style="cursor:pointer">${fmt(x.date_prevue, {weekday:"short", day:"numeric", month:"short"})}${x.heure_prevue ? " · " + hh(x.heure_prevue) : ""}${x.commentaire ? " · " + esc(x.commentaire) : ""}</span>
+        <span class="chip ${x.statut === "prevu" && x.date_prevue < a ? "retard" : x.statut}">${x.statut === "prevu" && x.date_prevue < a ? "Non documenté" : L.occ[x.statut]}</span>${x.statut !== "annule" ? `<button class="valide ${x.statut === "realise" ? "on" : ""}" style="width:28px;height:28px" data-a="occToggle" data-id="${x.id}">✓</button>` : ""}</div>`).join("")}
+        <div class="acts"><button class="sec" data-a="occAjout" data-id="${s.id}">+ Ajouter une occurrence</button></div></details></div>`; }).join("")}
+  <div class="acts">${Object.keys(L.soin).map(t => `<button class="sec" data-a="soinEdit" data-id="new:${t}">${L.soin[t][0]} ${L.nomSoin[t]}</button>`).join("")}</div>
+  <p class="note">Un soin passé non documenté n'est jamais considéré comme réalisé. Une modification de prescription conserve tous les soins déjà réalisés.</p>`;
+};
+
+VUES.seances = () => {
+  const k = U.segS, pc = phaseClin(), l = D.seances.filter(s => s.type === k).reverse();
+  const caps = [...new Set(D.objectifs_physiques.filter(o => o.phase_id === pc.id).map(o => o.capacite))];
+  return `<h1 class="page">Mes séances</h1><div class="seg">${[["kine","Kinésithérapie"],["physique","Préparation physique"]].map(([v, t]) => `<button class="${k === v ? "on" : ""}" data-a="seg" data-id="segS:${v}">${t}</button>`).join("")}</div>
+  ${k === "physique" ? `<h2>Jauges physiques · chapitre ${pc.numero} <button class="lien" data-a="objectif" data-id="new">+ Objectif</button></h2><div class="carte">
+    ${caps.map(c => { const o = D.objectifs_physiques.filter(x => x.phase_id === pc.id && x.capacite === c), v = o.filter(x => x.valide).length;
+      return `<div style="margin-bottom:.7rem"><div class="prog" style="margin:0"><b style="font:700 .92rem Manrope">${L.cap[c]}</b><small>Objectifs validés : ${v} / ${o.length}</small></div>${jauge("c" + c, pct(v, o.length), v === o.length ? "or" : "")}
+        ${o.map(x => `<div class="obj"><span data-a="objectif" data-id="${x.id}">${esc(x.libelle)}${x.cible ? ` <small>· ${esc(x.cible)}</small>` : ""}${x.valide && x.source === "kine" ? ` <span class="chip fait">kiné</span>` : ""}</span><button class="valide ${x.valide ? "on" : ""}" style="width:28px;height:28px" data-a="objToggle" data-id="${x.id}">✓</button></div>`).join("")}</div>`; }).join("") || `<p class="vide">Aucun objectif physique pour ce chapitre.</p>`}
+    <p class="note">Chaque jauge reflète le nombre d'objectifs validés, pas une estimation universelle de ta condition.</p></div>` : ""}
+  <h2>Séances enregistrées <small>${l.length}</small></h2><button class="prim" style="width:100%;margin-bottom:.8rem" data-a="seance" data-id="new:${k}">+ Nouvelle séance ${k === "kine" ? "kiné" : "physique"}</button>
+  ${l.map(s => { const p = D.paliers.find(x => x.id === s.palier_id);
+    return `<div class="carte seance" data-a="seance" data-id="${s.id}"><div class="ent"><b class="serif">${fmt(s.date, LONG)}</b><small>${s.duree ? s.duree + " min" : ""}</small></div>
+      <small>${[s.intervenant, p && "Palier " + p.code].filter(Boolean).map(esc).join(" · ")}</small>${s.objectifs ? `<p><b>Objectifs :</b> ${esc(s.objectifs)}</p>` : ""}${s.exercices ? `<p>${esc(s.exercices)}</p>` : ""}${s.consignes ? `<p><b>Consignes :</b> ${esc(s.consignes)}</p>` : ""}
+      <div class="indic">${s.rpe != null && k === "physique" ? `<span class="chip">RPE ${s.rpe}/10</span>` : ""}${s.douleur != null ? `<span class="chip">Douleur ${s.douleur}/10</span>` : ""}${s.gonflement != null ? `<span class="chip">Gonflement ${s.gonflement}/10</span>` : ""}${s.ressenti ? `<span class="chip">${esc(s.ressenti)}</span>` : ""}</div></div>`; }).join("") || `<p class="vide">Aucune séance enregistrée.</p>`}`;
+};
+
+// ----- Calendrier -----
+const itemsDu = d => [
+  ...D.evenements.filter(e => e.date === d).map(e => ({d, h:e.heure, ic:L.evt[e.type][0], t:e.titre, s:[L.evt[e.type][1], e.lieu, e.professionnel].filter(Boolean).join(" · "), etat:e.statut, a:"evtEdit", id:e.id, c:"evt"})),
+  ...D.soin_occurrences.filter(o => o.date_prevue === d && o.statut !== "annule").map(o => { const s = soin(o.soin_id); return {d, h:o.heure_prevue, ic:L.soin[s.type][0], t:s.nom, s:L.occ[o.statut], etat:o.statut, a:"occMenu", id:o.id, c:"soin"}; }),
+  ...D.seances.filter(x => x.date === d).map(x => ({d, ic:x.type === "kine" ? "🦵" : "🏋️", t:x.type === "kine" ? "Séance kiné" : "Séance physique", s:x.objectifs || "Séance enregistrée", a:"seance", id:x.id, c:"seance"})),
+  ...D.paliers.filter(p => p.date_validation === d).map(p => ({d, ic:"✦", t:`Palier ${p.code} validé`, s:p.nom, a:"palier", id:p.id, c:"palier"}))
+].sort((a, b) => (a.h || "99").localeCompare(b.h || "99"));
+VUES.agenda = () => {
+  const m = new Date(U.mois + "T12:00"), d0 = new Date(m), cases = [];
+  d0.setDate(1 - ((m.getDay() + 6) % 7));
+  for (let i = 0; i < 42; i++) { const d = iso(d0); cases.push(d); d0.setDate(d0.getDate() + 1); }
+  const lundi = addJ(U.jour, -((new Date(U.jour + "T12:00").getDay() + 6) % 7)), it = itemsDu(U.jour);
+  return `<h1 class="page">Calendrier</h1><div class="seg">${[["mois","Mois"],["semaine","Semaine"]].map(([v, t]) => `<button class="${U.vueA === v ? "on" : ""}" data-a="seg" data-id="vueA:${v}">${t}</button>`).join("")}</div>
+  ${U.vueA === "mois" ? `<div class="mois"><button data-a="mois" data-id="-1">‹</button><b>${m.toLocaleDateString("fr-FR", {month:"long", year:"numeric"})}</b><button data-a="mois" data-id="1">›</button></div>
+    <div class="grille">${["L","M","M","J","V","S","D"].map(j => `<div class="js">${j}</div>`).join("")}${cases.map(d => { const c = [...new Set(itemsDu(d).map(x => x.c))];
+      return `<button class="jour ${d.slice(0, 7) !== U.mois.slice(0, 7) ? "hors" : ""} ${d === auj() ? "auj" : ""} ${d === U.jour ? "sel" : ""}" data-a="jour" data-id="${d}">${+d.slice(8)}<span class="points">${c.map(k => `<i class="p-${k}"></i>`).join("")}</span></button>`; }).join("")}</div>
+    <div class="legende"><span><i class="p-evt"></i>Rendez-vous</span><span><i class="p-soin"></i>Soins</span><span><i class="p-seance"></i>Séances</span><span><i class="p-palier"></i>Paliers</span></div>
+    <h2>${fmt(U.jour, LONG)} <button class="lien" data-a="evtEdit" data-id="new:${U.jour}">+ Événement</button></h2><div class="carte">${it.map(ligneEvt).join("") || `<p class="vide">Rien de prévu ce jour.</p>`}</div>`
+  : `<div class="mois"><button data-a="semaine" data-id="-7">‹</button><b style="font-size:1rem">Semaine du ${fmt(lundi, {day:"numeric", month:"long"})}</b><button data-a="semaine" data-id="7">›</button></div>
+    ${Array.from({length:7}, (_, i) => addJ(lundi, i)).map(d => { const x = itemsDu(d); return `<div class="sem-j"><h4>${fmt(d, LONG)}${d === auj() ? " · aujourd'hui" : ""} <button class="lien" data-a="evtEdit" data-id="new:${d}">+</button></h4><div class="carte" style="padding:.4rem .9rem">${x.map(ligneEvt).join("") || `<p class="vide">—</p>`}</div></div>`; }).join("")}`}`;
+};
+
+// ----- Carnet d'aventure -----
+VUES.carnet = () => {
+  const jn = D.journal.find(x => x.date === auj()), so = x => soin(x.soin_id);
+  const t = [...D.soin_occurrences.filter(o => o.statut === "realise").map(o => ({d:o.realise_le ? iso(new Date(o.realise_le)) : o.date_prevue, ic:L.soin[so(o).type][0], t:`${so(o).nom} documenté`, s:o.commentaire})),
+    ...D.seances.map(x => ({d:x.date, ic:x.type === "kine" ? "🦵" : "🏋️", t:x.type === "kine" ? "Séance kiné" : "Séance de préparation physique", s:x.objectifs})),
+    ...D.evenements.filter(e => e.statut === "fait").map(e => ({d:e.date, ic:L.evt[e.type][0], t:e.titre, s:e.compte_rendu})),
+    ...D.criteres.filter(c => c.statut === "atteint" && c.date_eval).map(c => ({d:c.date_eval, ic:"✅", t:`Critère atteint : ${c.nom}`, s:c.valeur ? c.valeur + (c.unite || "") : ""})),
+    ...D.paliers.filter(p => p.statut === "valide" && p.date_validation).map(p => ({d:p.date_validation, ic:"✦", t:`Palier ${p.code} validé — ${p.nom}`, s:p.validateur, or:1})),
+    ...D.journal.map(x => ({d:x.date, ic:"📓", t:"Journal", s:[x.douleur != null && `douleur ${x.douleur}/10`, x.gonflement != null && `gonflement ${x.gonflement}/10`, x.confiance != null && `confiance ${x.confiance}/10`, x.ressenti, x.notes].filter(Boolean).join(" · ")})),
+    ...D.mesures.map(m => ({d:m.date, ic:"📐", t:`${L.mes[m.type]?.[0] || m.type} : ${nb(m.valeur)} ${m.unite || ""}`, s:m.methode}))].sort((a, b) => b.d.localeCompare(a.d)).slice(0, 120);
+  const jours = [...new Set(t.map(x => x.d))];
+  return `<h1 class="page">Carnet d'aventure</h1>
+  <div class="carte"><div class="ent" style="display:flex;justify-content:space-between;align-items:center"><b class="serif">Journal du jour</b><button class="${jn ? "sec" : "prim"}" data-a="journal" data-id="${auj()}">${jn ? "Modifier" : "Remplir"}</button></div>
+    ${jn ? `<div class="indic">${["douleur","gonflement","fatigue","confiance"].map(k => jn[k] != null ? `<span class="chip">${k[0].toUpperCase() + k.slice(1)} ${jn[k]}/10</span>` : "").join("")}</div>${jn.ressenti ? `<p class="note">${esc(jn.ressenti)}</p>` : ""}` : `<p class="note">Douleur, gonflement, fatigue, confiance, difficultés et notes personnelles.</p>`}</div>
+  <div class="stats"><div><b>${nb(D.xpTotal)}</b><small>XP</small></div><div><b>${D.soin_occurrences.filter(o => o.statut === "realise").length}</b><small>Soins</small></div><div><b>${D.seances.length}</b><small>Séances</small></div><div><b>${serie()}</b><small>Jours d'affilée</small></div></div>
+  <h2>Badges <small>${badgesObtenus().length} / ${BADGES.length}</small></h2><div class="badges">${BADGES.map(b => `<span class="badge ${b[3]() ? "on" : ""}" title="${esc(b[2])}">${b[1]} ${b[0]}</span>`).join("")}</div>
+  <h2>Chronologie <button class="lien" data-a="historique">Historique des décisions</button></h2>
+  ${jours.map(d => `<div class="tl-j"><h4>${fmt(d, LONG)} · J+${ecart(D.profil.date_operation, d)}</h4><div class="carte" style="padding:.5rem .9rem">${t.filter(x => x.d === d).map(x => `<div class="tl ${x.or ? "or" : ""}"><span>${x.ic}</span><span><b>${esc(x.t)}</b>${x.s ? `<small style="display:block">${esc(x.s)}</small>` : ""}</span></div>`).join("")}</div></div>`).join("") || `<p class="vide">Ton aventure commence : les événements apparaîtront ici.</p>`}
+  <div class="acts"><button class="sec" data-a="exporter">⬇ Exporter mes données</button></div>`;
+};
+
+// ===== Formulaire générique (une seule boîte de dialogue réutilisée) =====
+const champ = (c, v) => { const l = `<label>${c.l}</label>`, n = `name="${c.k}"`, cl = c.plein || ["textarea","range","check"].includes(c.t) ? "plein" : "";
+  if (c.t === "select") return `<div class="${cl}">${l}<select ${n}>${c.o.map(([k, t]) => `<option value="${esc(k)}"${String(k) === String(v ?? "") ? " selected" : ""}>${esc(t)}</option>`).join("")}</select></div>`;
+  if (c.t === "textarea") return `<div class="plein">${l}<textarea ${n} rows="${c.rows || 2}" placeholder="${esc(c.ph || "")}">${esc(v)}</textarea></div>`;
+  if (c.t === "check") return `<div class="plein"><label class="coche"><input type="checkbox" ${n}${v ? " checked" : ""}> ${c.l}</label></div>`;
+  if (c.t === "range") return `<div class="plein">${l}<div class="curseur"><input type="range" min="0" max="10" ${n} value="${v ?? 0}" oninput="this.nextElementSibling.value=this.value"><output>${v ?? 0}</output></div></div>`;
+  return `<div class="${cl}">${l}<input type="${c.t || "text"}" ${n} value="${esc(c.t === "time" ? hh(v) : v)}"${c.t === "number" ? ' step="any"' : ""}${c.req ? " required" : ""} placeholder="${esc(c.ph || "")}"></div>`; };
+const formulaire = (t, champs, v = {}, {intro = "", extras = []} = {}) => new Promise(res => {
+  const d = $("#dlg");
+  d.innerHTML = `<form method="dialog"><h3>${t}</h3>${intro}<div class="champs">${champs.map(c => champ(c, v[c.k])).join("")}</div>
+    <div class="acts">${extras.map(([k, l, cl]) => `<button value="${k}" class="${cl || "sec"}" formnovalidate>${l}</button>`).join("")}<span class="sp"></span><button value="annuler" formnovalidate>Annuler</button><button value="ok" class="prim">Enregistrer</button></div></form>`;
+  // Ignore l'événement de fermeture d'une boîte précédente (la boîte est déjà rouverte)
+  d.onclose = () => { if (d.open) return; d.onclose = null; const b = d.returnValue; if (!b || b === "annuler") return res(null);
+    const r = {_b:b}; champs.forEach(c => { const el = d.querySelector(`[name="${c.k}"]`); r[c.k] = c.t === "check" ? el.checked : el.value === "" ? null : ["number","range"].includes(c.t) ? +el.value : el.value; }); res(r); };
+  d.returnValue = ""; d.showModal();
+});
+const sans_b = r => { const {_b, ...x} = r; return x; };
+const SUPPR = [["suppr","Supprimer","danger"]];
+
+// ===== Actions (délégation de clics via data-a / data-id) =====
+const A = {
+  tab: id => { U.tab = id; rendre(); scrollTo(0, 0); },
+  seg: id => { const [k, v] = id.split(":"); U[k] = v; rendre(); },
+  fermer: () => $("#dlg").close(),
+  jq: id => { U.jq = addJ(U.jq, +id); rendre(); },
+  mois: id => { const m = new Date(U.mois + "T12:00"); m.setMonth(m.getMonth() + +id); U.mois = iso(m).slice(0, 8) + "01"; rendre(); },
+  semaine: id => { U.jour = addJ(U.jour, +id); rendre(); },
+  jour: id => { U.jour = id; rendre(); },
+  chapitre: id => { const o = U.ouvert == null ? phaseClin().id === id : U.ouvert === id; U.ouvert = o ? "" : id; rendre(); },
+
+  // ----- Quêtes -----
+  qPlus: async id => { const [qid, d] = id.split("|"), q = quete(qid), x = qj(q, d) || {valeur:0, statut:"en_cours"}, v = +x.valeur + pas(q);
+    await enrQ(q, d, {valeur:v, statut:v >= q.cible ? "terminee" : x.statut === "terminee" ? "terminee" : "en_cours"}); },
+  qFin: async id => { const [qid, d] = id.split("|"), q = quete(qid), x = qj(q, d);
+    await enrQ(q, d, x?.statut === "terminee" ? {statut:"en_cours"} : {statut:"terminee", valeur:Math.max(+(x?.valeur || 0), +q.cible)}); },
+  qDetail: async id => { const [qid, d] = id.split("|"), q = quete(qid), x = qj(q, d) || {valeur:0, statut:"en_cours", sequences:0};
+    const r = await formulaire(`${q.icone} ${esc(q.titre)}`, [{k:"valeur", l:`Réalisé (${q.unite})`, t:"number"}, {k:"sequences", l:"Nombre de séquences", t:"number"},
+      {k:"statut", l:"Statut", t:"select", o:opts(L.qst)}, {k:"aides", l:"Aides utilisées", ph:"Béquilles, attelle…"}, {k:"douleur", l:"Douleur", t:"range"},
+      {k:"ressenti", l:"Ressenti", t:"textarea"}, {k:"commentaire", l:"Réaction du genou / commentaire", t:"textarea"}], x,
+      {intro:`<p class="note" style="margin:-.3rem 0 .8rem">${fmt(d, LONG)} · objectif ${nb(q.cible)} ${esc(q.unite)}. Une quête peut être fractionnée, reportée ou suspendue.</p>`, extras:[["modele","✎ Modifier la quête"]]});
+    if (!r) return; if (r._b === "modele") return A.queteEdit(q.id);
+    await enrQ(q, d, sans_b(r)); },
+  queteEdit: async id => { const q = id === "new" ? {icone:"🧭", categorie:"recuperation", cible:1, unite:"fois", xp:pts("quete"), date_debut:auj(), actif:true} : quete(id);
+    const r = await formulaire(id === "new" ? "Nouvelle quête" : "Modifier la quête", [{k:"titre", l:"Titre", req:1, plein:1}, {k:"icone", l:"Icône"}, {k:"categorie", l:"Catégorie", t:"select", o:opts(L.cat)},
+      {k:"description", l:"Description", t:"textarea"}, {k:"cible", l:"Objectif", t:"number", req:1}, {k:"unite", l:"Unité", ph:"min, fois, séance…", req:1}, {k:"xp", l:"Récompense XP", t:"number", req:1},
+      {k:"date_debut", l:"Début", t:"date", req:1}, {k:"date_fin", l:"Fin (vide = sans fin)", t:"date"}, {k:"actif", l:"Quête active", t:"check"}], q, {extras:id === "new" ? [] : SUPPR});
+    if (!r) return;
+    if (r._b === "suppr") { if (!confirm("Supprimer cette quête et son historique ? Pour l'arrêter en gardant l'historique, décoche « Quête active ».")) return; ok(await sb.from("quetes").delete().eq("id", id)); }
+    else ok(id === "new" ? await sb.from("quetes").insert(sans_b(r)) : await sb.from("quetes").update(sans_b(r)).eq("id", id));
+    await maj(); },
+
+  // ----- Soins -----
+  occToggle: async id => { const o = occ(id);
+    ok(await sb.from("soin_occurrences").update(o.statut === "realise" ? {statut:"prevu", realise_le:null} : {statut:"realise", realise_le:new Date().toISOString()}).eq("id", id)); await maj(); },
+  occMenu: async id => { const o = occ(id), s = soin(o.soin_id);
+    const r = await formulaire(`${L.soin[s.type][0]} ${esc(s.nom)}`, [{k:"statut", l:"Statut", t:"select", o:opts(L.occ)}, {k:"date_prevue", l:"Date prévue", t:"date", req:1}, {k:"heure_prevue", l:"Heure prévue", t:"time"},
+      {k:"commentaire", l:"Commentaire", t:"textarea"}, {k:"observation", l:"Observation (cicatrice, réaction…)", t:"textarea"}], o,
+      {intro:o.realise_le ? `<p class="note" style="margin:-.3rem 0 .8rem">Réalisé le ${new Date(o.realise_le).toLocaleString("fr-FR", {dateStyle:"medium", timeStyle:"short"})}</p>` : ""});
+    if (!r) return; const x = sans_b(r);
+    x.realise_le = x.statut === "realise" ? o.realise_le || new Date().toISOString() : null;
+    ok(await sb.from("soin_occurrences").update(x).eq("id", id)); await maj(); },
+  occAjout: async id => { const s = soin(id), t = occDe(s, true);
+    const r = await formulaire("Ajouter une occurrence", [{k:"date_prevue", l:"Date", t:"date", req:1}, {k:"heure_prevue", l:"Heure", t:"time"}], {date_prevue:t.length ? addJ(t.at(-1).date_prevue, s.frequence_jours) : auj(), heure_prevue:s.heure});
+    if (!r) return; ok(await sb.from("soin_occurrences").insert({soin_id:id, ...sans_b(r)})); await maj(); },
+  soinEdit: async id => { const nv = id.startsWith("new"), t = nv ? id.split(":")[1] : null;
+    const s = nv ? {type:t, nom:L.nomSoin[t], date_debut:auj(), frequence_jours:t === "pansement" ? 2 : t === "prise_sang" ? 7 : 1, nb_total:t === "injection" ? 14 : 4} : soin(id);
+    const r = await formulaire(nv ? "Nouveau programme de soins" : "Modifier la prescription", [{k:"type", l:"Type", t:"select", o:opts(L.soin)}, {k:"nom", l:"Nom", req:1},
+      {k:"date_debut", l:"Date de début", t:"date", req:1}, {k:"heure", l:"Heure prévue", t:"time"}, {k:"frequence_jours", l:"Tous les … jours", t:"number", req:1}, {k:"nb_total", l:"Nombre total prévu", t:"number", req:1},
+      {k:"note", l:"Prescription / consignes", t:"textarea"}, ...(nv ? [] : [{k:"motif", l:"Motif de la modification", t:"textarea", ph:"Prescription prolongée par…"}])], s,
+      {intro:nv ? "" : `<p class="note" style="margin:-.3rem 0 .8rem">Les soins déjà réalisés ou passés sont conservés ; seuls les soins futurs non réalisés sont recalculés.</p>`, extras:nv ? [] : [...(s.actif ? [["stop","Arrêter le programme"]] : []), ...SUPPR]});
+    if (!r) return;
+    if (r._b === "suppr") { if (!confirm("Supprimer ce programme et tout son historique ? Préfère « Arrêter le programme » pour conserver l'historique.")) return; ok(await sb.from("soins").delete().eq("id", id)); return maj(); }
+    if (r._b === "stop") { ok(await sb.from("soin_occurrences").update({statut:"annule"}).eq("soin_id", id).eq("statut", "prevu").gte("date_prevue", auj()));
+      ok(await sb.from("soins").update({actif:false, motif:r.motif || "Programme arrêté"}).eq("id", id)); return maj(); }
+    const x = sans_b(r); x.frequence_jours = Math.max(1, Math.round(x.frequence_jours)); x.nb_total = Math.max(1, Math.round(x.nb_total));
+    const row = ok(nv ? await sb.from("soins").insert(x).select().single() : await sb.from("soins").update(x).eq("id", id).select().single());
+    await regenerer(row); await maj(); },
+
+  // ----- Calendrier -----
+  evtEdit: async id => { const nv = id.startsWith("new"), e = nv ? {type:"kine", date:id.split(":")[1] || auj(), statut:"prevu"} : D.evenements.find(x => x.id === id);
+    const r = await formulaire(nv ? "Nouvel événement" : "Événement", [{k:"type", l:"Type", t:"select", o:opts(L.evt)}, {k:"titre", l:"Titre", req:1}, {k:"date", l:"Date", t:"date", req:1}, {k:"heure", l:"Heure", t:"time"},
+      {k:"lieu", l:"Lieu"}, {k:"professionnel", l:"Professionnel"}, {k:"statut", l:"Statut", t:"select", o:[["prevu","Prévu"],["fait","Fait"],["annule","Annulé"]]}, {k:"commentaire", l:"Commentaire", t:"textarea"},
+      {k:"compte_rendu", l:"Compte rendu", t:"textarea", rows:3}], e, {extras:nv ? [] : SUPPR});
+    if (!r) return;
+    if (r._b === "suppr") ok(await sb.from("evenements").delete().eq("id", id));
+    else ok(nv ? await sb.from("evenements").insert(sans_b(r)) : await sb.from("evenements").update(sans_b(r)).eq("id", id));
+    await maj(); },
+  evtToggle: async id => { const e = D.evenements.find(x => x.id === id), f = e.statut !== "fait";
+    ok(await sb.from("evenements").update({statut:f ? "fait" : "prevu"}).eq("id", id)); await maj();
+    // Rendez-vous kiné ou physique terminé : proposer d'enregistrer la séance
+    if (f && ["kine","physique"].includes(e.type) && !D.seances.some(s => s.date === e.date && s.type === e.type) && confirm("Enregistrer le contenu de cette séance ?")) A.seance(`new:${e.type}:${e.date}:${e.professionnel || ""}`); },
+
+  // ----- Séances et préparation physique -----
+  seance: async id => { const nv = id.startsWith("new"), [, t, d, p] = id.split(":"), s = nv ? {type:t, date:d || auj(), intervenant:p || "", palier_id:palActif()?.id} : D.seances.find(x => x.id === id), k = s.type === "kine";
+    const r = await formulaire(`${nv ? "Nouvelle séance" : "Séance"} ${k ? "kiné" : "physique"}`, [{k:"date", l:"Date", t:"date", req:1}, {k:"duree", l:"Durée (min)", t:"number"},
+      {k:"intervenant", l:k ? "Kiné" : "Encadrant"}, {k:"palier_id", l:"Palier", t:"select", o:[["","—"], ...D.paliers.map(x => [x.id, `${x.code} · ${x.nom}`])]},
+      {k:"objectifs", l:k ? "Objectifs" : "Type / objectif", t:"textarea"}, {k:"exercices", l:"Exercices, séries, répétitions, charges", t:"textarea", rows:4, ph:"Un exercice par ligne : 3 × 10 · 20 kg"},
+      ...(k ? [{k:"mesures", l:"Mesures cliniques", t:"textarea", ph:"Flexion 95°, extension -2°…"}] : [{k:"rpe", l:"RPE (effort perçu)", t:"range"}]),
+      {k:"douleur", l:"Douleur", t:"range"}, {k:"gonflement", l:k ? "Gonflement" : "Réaction du genou (gonflement)", t:"range"}, {k:"ressenti", l:"Ressenti"},
+      {k:"commentaire", l:"Commentaires", t:"textarea"}, ...(k ? [{k:"consignes", l:"Nouvelles consignes / objectifs suivants", t:"textarea"}] : [])], s, {extras:nv ? [] : SUPPR});
+    if (!r) return;
+    if (r._b === "suppr") { if (!confirm("Supprimer cette séance ?")) return; ok(await sb.from("seances").delete().eq("id", id)); }
+    else { const x = {...sans_b(r), type:s.type}; ok(nv ? await sb.from("seances").insert(x) : await sb.from("seances").update(x).eq("id", id)); }
+    await maj(); },
+  objectif: async id => { const nv = id === "new", o = nv ? {capacite:"force", phase_id:phaseClin().id, source:"patient"} : D.objectifs_physiques.find(x => x.id === id);
+    const r = await formulaire(nv ? "Nouvel objectif physique" : "Objectif physique", [{k:"capacite", l:"Capacité", t:"select", o:opts(L.cap)}, {k:"phase_id", l:"Chapitre", t:"select", o:D.phases.map(p => [p.id, `${p.numero}. ${p.nom}`])},
+      {k:"libelle", l:"Objectif", req:1, plein:1}, {k:"cible", l:"Cible", ph:"3 × 12 à 20 kg…"}, {k:"source", l:"Saisie", t:"select", o:opts(L.src)}, {k:"valide", l:"Objectif validé", t:"check"}], o, {extras:nv ? [] : SUPPR});
+    if (!r) return;
+    if (r._b === "suppr") ok(await sb.from("objectifs_physiques").delete().eq("id", id));
+    else { const x = sans_b(r); x.date_validation = x.valide ? o.date_validation || auj() : null; ok(nv ? await sb.from("objectifs_physiques").insert(x) : await sb.from("objectifs_physiques").update(x).eq("id", id)); }
+    await maj(); },
+  objToggle: async id => { const o = D.objectifs_physiques.find(x => x.id === id); ok(await sb.from("objectifs_physiques").update({valide:!o.valide, date_validation:o.valide ? null : auj()}).eq("id", id)); await maj(); },
+
+  // ----- Moteur de paliers -----
+  palier: id => ouvrirPalier(id),
+  phaseEdit: async id => { const p = phase(id);
+    const r = await formulaire(`Chapitre ${p.numero}`, [{k:"nom", l:"Nom", req:1, plein:1}, {k:"objectif", l:"Objectif", plein:1}, {k:"debut_jour", l:"Début indicatif (J+)", t:"number", req:1}, {k:"fin_jour", l:"Fin indicative (J+, vide = ouverte)", t:"number"},
+      {k:"description", l:"Objectifs cliniques", t:"textarea", rows:3}, {k:"restrictions", l:"Restrictions", t:"textarea", rows:3}], p);
+    if (!r) return; ok(await sb.from("phases").update(sans_b(r)).eq("id", id)); await maj(); },
+  palierEdit: async id => { const p = D.paliers.find(x => x.id === id);
+    const r = await formulaire(`Palier ${p.code}`, [{k:"nom", l:"Nom", req:1, plein:1}, {k:"objectifs", l:"Objectifs", t:"textarea"}, {k:"date_min", l:"Date minimale éventuelle", t:"date"}, {k:"prolonge", l:"Palier prolongé par le kiné", t:"check"},
+      {k:"motif", l:"Motif / décision du kiné", t:"textarea"}], {...p, motif:""});
+    if (!r) return; ok(await sb.from("paliers").update(sans_b(r)).eq("id", id)); await maj(); ouvrirPalier(id); },
+  palierSuspendre: async id => { const p = D.paliers.find(x => x.id === id), s = p.statut === "suspendu";
+    const motif = prompt(s ? "Reprise de la progression — commentaire :" : "Motif de la suspension (décision du kiné) :", ""); if (motif === null) return;
+    ok(await sb.from("paliers").update({statut:s ? "actif" : "suspendu", motif}).eq("id", id)); await maj(); ouvrirPalier(id); },
+  palierValider: async id => { const p = D.paliers.find(x => x.id === id), ph = phase(p.phase_id);
+    const r = await formulaire(`Valider le palier ${p.code}`, [{k:"validateur", l:"Professionnel validateur", req:1, plein:1}, {k:"date_validation", l:"Date de validation", t:"date", req:1},
+      {k:"motif", l:"Commentaire du professionnel", t:"textarea"}, {k:"confirme", l:"Cette validation a été donnée par le professionnel compétent lors d'une évaluation.", t:"check"}], {date_validation:auj()});
+    if (!r) return; if (!r.confirme) return toast("La validation d'un palier doit venir du professionnel.", true);
+    ok(await sb.from("paliers").update({statut:"valide", validateur:r.validateur, date_validation:r.date_validation, motif:r.motif || "Palier validé"}).eq("id", id));
+    await maj(); const nx = palActif();
+    if (nx && nx.phase_id !== ph.id) { const n = phase(nx.phase_id); U.ouvert = null; celebrer(`Chapitre ${n.numero} : ${n.nom}`, `Chapitre ${ph.numero} terminé · nouveau territoire`, ICO_PHASE[n.numero - 1] || "✦"); }
+    else celebrer(`Palier ${p.code} validé`, p.nom, "✦"); },
+  critere: async id => { const nv = id.startsWith("new"), c = nv ? {palier_id:id.split(":")[1], obligatoire:true, statut:"non_evalue", source:"kine"} : D.criteres.find(x => x.id === id);
+    const r = await formulaire(nv ? "Nouveau critère" : "Critère clinique", [{k:"nom", l:"Critère", req:1, plein:1}, {k:"methode", l:"Méthode d'évaluation", plein:1}, {k:"cible", l:"Valeur cible"}, {k:"unite", l:"Unité"},
+      {k:"statut", l:"Statut", t:"select", o:opts(L.crit)}, {k:"valeur", l:"Valeur mesurée"}, {k:"date_eval", l:"Date d'évaluation", t:"date"}, {k:"auteur", l:"Évalué par"},
+      {k:"source", l:"Type de saisie", t:"select", o:opts(L.src)}, {k:"obligatoire", l:"Critère obligatoire pour le passage", t:"check"}, {k:"commentaire", l:"Commentaire", t:"textarea"},
+      ...(nv ? [] : [{k:"motif", l:"Motif de la modification", t:"textarea"}])], {...c, motif:""}, {extras:nv ? [] : SUPPR});
+    if (!r) return ouvrirPalier(c.palier_id);
+    if (r._b === "suppr") ok(await sb.from("criteres").delete().eq("id", id));
+    else { const x = sans_b(r); if (x.statut !== "non_evalue" && !x.date_eval) x.date_eval = auj(); ok(nv ? await sb.from("criteres").insert({...x, palier_id:c.palier_id}) : await sb.from("criteres").update(x).eq("id", id)); }
+    await maj(); ouvrirPalier(c.palier_id); },
+  mesure: async id => { const nv = id === "new", m = nv ? {type:"flexion", date:auj(), source:"patient"} : D.mesures.find(x => x.id === id);
+    const r = await formulaire(nv ? "Nouvelle mesure" : "Mesure", [{k:"type", l:"Mesure", t:"select", o:opts(L.mes)}, {k:"valeur", l:"Valeur", t:"number", req:1}, {k:"unite", l:"Unité (vide = automatique)"},
+      {k:"date", l:"Date", t:"date", req:1}, {k:"methode", l:"Méthode", ph:"Goniomètre, mètre ruban…"}, {k:"source", l:"Saisie", t:"select", o:opts(L.src)}, {k:"commentaire", l:"Commentaire", t:"textarea"}], m, {extras:nv ? [] : SUPPR});
+    if (!r) return;
+    if (r._b === "suppr") ok(await sb.from("mesures").delete().eq("id", id));
+    else { const x = sans_b(r); x.unite = x.unite ?? L.mes[x.type]?.[1] ?? null; ok(nv ? await sb.from("mesures").insert(x) : await sb.from("mesures").update(x).eq("id", id)); }
+    await maj(); },
+
+  // ----- Journal, réglages, export -----
+  journal: async d => { const j = D.journal.find(x => x.date === d) || {date:d};
+    const r = await formulaire(`📓 Journal — ${fmt(d, LONG)}`, [{k:"douleur", l:"Douleur", t:"range"}, {k:"gonflement", l:"Gonflement", t:"range"}, {k:"fatigue", l:"Fatigue", t:"range"}, {k:"confiance", l:"Confiance", t:"range"},
+      {k:"ressenti", l:"Ressenti", t:"textarea"}, {k:"difficultes", l:"Difficultés", t:"textarea"}, {k:"notes", l:"Notes personnelles", t:"textarea"}], j);
+    if (!r) return; ok(await sb.from("journal").upsert({...sans_b(r), date:d}, {onConflict:"user_id,date"})); await maj(); },
+  reglages: async () => { const p = D.profil;
+    const r = await formulaire(`${AV()} Réglages`, [{k:"prenom", l:"Prénom"}, {k:"date_operation", l:"Date de l'opération", t:"date", req:1}, {k:"sport", l:"Sport"}, {k:"genou", l:"Genou opéré", t:"select", o:[["","—"],["droit","Droit"],["gauche","Gauche"]]},
+      {k:"greffe", l:"Type de greffe", plein:1, ph:"DIDT, tendon rotulien…"}, {k:"animations", l:"Animations activées", t:"check"}], p,
+      {extras:[["bareme","Barème XP"], ["export","Exporter"], ["logout","Déconnexion","danger"]]});
+    if (!r) return;
+    if (r._b === "logout") return sb.auth.signOut();
+    if (r._b === "export") return A.exporter();
+    if (r._b === "bareme") return A.bareme();
+    ok(await sb.from("profils").update(sans_b(r)).eq("user_id", p.user_id)); await maj(); },
+  bareme: async () => { const r = await formulaire("Barème XP", D.bareme.map(b => ({k:b.source, l:b.libelle || b.source, t:"number", req:1})), Object.fromEntries(D.bareme.map(b => [b.source, b.points])),
+      {intro:`<p class="note" style="margin:-.3rem 0 .8rem">Les XP récompensent la documentation et la régularité. Ils ne débloquent jamais une étape médicale. Le nouveau barème s'applique aux prochaines actions.</p>`});
+    if (!r) return; ok(await sb.from("bareme").upsert(D.bareme.map(b => ({source:b.source, libelle:b.libelle, points:Math.round(r[b.source])})), {onConflict:"user_id,source"})); await maj(); },
+  historique: async () => { const h = ok(await sb.from("historique").select("*").order("id", {ascending:false}).limit(80)), d = $("#dlg");
+    d.onclose = null;
+    d.innerHTML = `<div class="dlg-in"><h3>Historique des décisions</h3><p class="note">Toutes les modifications de chapitres, paliers, critères, prescriptions, objectifs et quêtes sont conservées.</p>
+      ${h.map(x => { const n = x.apres || x.avant || {}; return `<div class="occ"><span><b>${L.tab[x.table_nom] || x.table_nom}</b> · ${L.act[x.action] || x.action} · ${esc(n.code ? n.code + " " : "")}${esc(n.nom || n.titre || n.libelle || "")}${x.motif ? `<small style="display:block">${esc(x.motif)}</small>` : ""}</span><small>${new Date(x.created_at).toLocaleString("fr-FR", {dateStyle:"short", timeStyle:"short"})}</small></div>`; }).join("") || `<p class="vide">Aucune modification.</p>`}
+      <div class="acts"><span class="sp"></span><button class="prim" data-a="fermer">Fermer</button></div></div>`;
+    d.showModal(); },
+  exporter: async () => { const h = ok(await sb.from("historique").select("*").order("id")), x = ok(await sb.from("xp").select("*").order("id"));
+    const b = new Blob([JSON.stringify({exporte_le:new Date().toISOString(), ...D, xp:x, historique:h}, null, 2)], {type:"application/json"});
+    const a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = `rebuild_export_${auj()}.json`; a.click(); }
+};
+document.addEventListener("click", async e => { const t = e.target.closest("[data-a]"); if (!t || t.disabled || !A[t.dataset.a]) return;
+  if (t.closest("dialog") && !["fermer"].includes(t.dataset.a)) $("#dlg").close();
+  try { await A[t.dataset.a](t.dataset.id, t); } catch (err) { console.error(err); } });
+
+// Enregistrement d'une quête pour un jour donné (XP attribués côté base, une seule fois)
+const enrQ = async (q, d, champs) => { ok(await sb.from("quete_jours").upsert({quete_id:q.id, date:d, ...champs}, {onConflict:"quete_id,date"})); await maj(); };
+
+// Recalcul d'un programme de soins sans perdre l'historique
+const regenerer = async s => {
+  const a = auj(), l = D.soin_occurrences.filter(o => o.soin_id === s.id);
+  const garder = l.filter(o => o.statut !== "prevu" || o.date_prevue < a), suppr = l.filter(o => !garder.includes(o)).map(o => o.id);
+  if (suppr.length) ok(await sb.from("soin_occurrences").delete().in("id", suppr));
+  if (!s.actif) return;
+  const prises = new Set(garder.filter(o => o.statut !== "annule").map(o => o.date_prevue)), manque = s.nb_total - prises.size;
+  const nouv = Array.from({length:s.nb_total}, (_, i) => addJ(s.date_debut, i * s.frequence_jours)).filter(d => !prises.has(d)).slice(0, Math.max(0, manque));
+  if (nouv.length) ok(await sb.from("soin_occurrences").insert(nouv.map(d => ({soin_id:s.id, date_prevue:d, heure_prevue:s.heure}))));
+};
+
+// ----- Fiche palier -----
+const ouvrirPalier = id => {
+  const p = D.paliers.find(x => x.id === id), cr = critsDe(p), bl = blocages(p), d = $("#dlg"), ph = phase(p.phase_id);
+  d.onclose = null;
+  d.innerHTML = `<div class="dlg-in"><small>Chapitre ${ph.numero} · palier ${p.code} · ${L.pal[p.statut]}${p.prolonge ? " · prolongé" : ""}</small><h3>${esc(p.nom)}</h3>
+    ${p.objectifs ? `<p style="font-size:.9rem">${esc(p.objectifs)}</p>` : ""}${p.date_min ? `<p class="note">Date minimale : ${fmt(p.date_min, LONG)}</p>` : ""}
+    ${p.statut === "valide" ? `<p class="ok">✦ Validé le ${fmt(p.date_validation, LONG)} par ${esc(p.validateur)}</p>` : ""}${p.motif ? `<p class="note">${esc(p.motif)}</p>` : ""}
+    <h4>Critères cliniques ${cr.length ? `· ${cr.filter(critOK).length} / ${cr.length}` : ""}</h4>
+    ${cr.map(c => `<button class="crit ${c.statut}" data-a="critere" data-id="${c.id}"><span class="pastille"></span><span><b>${esc(c.nom)}</b><small>${[c.methode, c.cible && `cible ${c.cible}${c.unite || ""}`, c.valeur && `mesuré ${c.valeur}${c.unite || ""}`, c.date_eval && fmt(c.date_eval), !c.obligatoire && "facultatif"].filter(Boolean).map(esc).join(" · ")}</small></span>
+      <em>${L.crit[c.statut]}${c.statut !== "non_evalue" ? (c.source === "kine" ? " · kiné" : " · patient") : ""}</em></button>`).join("") || `<p class="vide">Aucun critère : ton kiné définit les critères de ce palier.</p>`}
+    <button class="lien" style="margin-top:.6rem" data-a="critere" data-id="new:${p.id}">+ Ajouter un critère</button>
+    ${["actif","suspendu"].includes(p.statut) ? `<div class="bloc-valid">${bl.length ? `<b>Conditions de passage restantes</b><ul>${bl.map(b => `<li>${esc(b)}</li>`).join("")}</ul>` : `<b>Toutes les conditions sont réunies.</b> La validation revient au professionnel.`}<p class="note">Ni le temps écoulé ni les XP ne débloquent un palier.</p></div>` : ""}
+    <div class="acts"><button class="sec" data-a="palierEdit" data-id="${p.id}">✎ Modifier</button>${p.statut === "actif" ? `<button class="sec" data-a="palierSuspendre" data-id="${p.id}">Suspendre</button>` : p.statut === "suspendu" ? `<button class="sec" data-a="palierSuspendre" data-id="${p.id}">Reprendre</button>` : ""}
+      <span class="sp"></span><button data-a="fermer">Fermer</button>${p.statut === "actif" ? `<button class="prim" data-a="palierValider" data-id="${p.id}"${bl.length ? " disabled" : ""}>Valider</button>` : ""}</div></div>`;
+  d.showModal();
+};
+
+// ===== Authentification et démarrage =====
+$("#f-login").onsubmit = async e => {
+  e.preventDefault(); $("#l-err").textContent = "";
+  const {error} = await sb.auth.signInWithPassword({email:$("#l-mail").value, password:$("#l-mdp").value});
+  if (error) { const m = error.message || String(error);
+    $("#l-err").textContent = /Invalid login credentials/i.test(m) ? "Email ou mot de passe incorrect (vérifie l'utilisateur dans Supabase > Authentication > Users)."
+      : /Email not confirmed/i.test(m) ? "Compte non confirmé : dans Supabase > Authentication > Users, confirme l'utilisateur."
+      : /Invalid API key|No API key/i.test(m) ? "Clé Supabase incorrecte dans le fichier (SUPABASE_KEY)."
+      : /fetch|network|Load failed/i.test(m) ? "Supabase injoignable : projet en pause ou adresse SUPABASE_URL incorrecte." : "Erreur Supabase : " + m; }
+};
+// Premier lancement : création du parcours et du programme d'injections
+$("#f-init").onsubmit = async e => {
+  e.preventDefault(); $("#i-err").textContent = "";
+  try { const d = $("#i-date").value;
+    ok(await sb.rpc("rb_initialiser", {p_date_op:d, p_prenom:$("#i-prenom").value || null, p_sport:$("#i-sport").value || null}));
+    if ($("#i-inj").checked) { const s = ok(await sb.from("soins").insert({type:"injection", nom:"Injections anticoagulantes", date_debut:$("#i-inj-d").value || d, frequence_jours:1, nb_total:14, note:"Prescription initiale : 1 injection par jour pendant 14 jours."}).select().single());
+      D.soin_occurrences = []; await regenerer(s); }
+    await demarrer();
+  } catch (err) { $("#i-err").textContent = err.message || String(err);
+    // Parcours créé malgré l'erreur : on entre quand même dans l'application
+    try { await charger(); if (D.profil) demarrer(); } catch (e) {} }
+};
+let lance = false;
+const ecran = id => ["login","init","app"].forEach(x => $("#" + x).classList.toggle("hide", x !== id));
+const demarrer = async () => { try { await charger(); } catch (e) { ecran("login"); $("#l-err").textContent = "Chargement impossible : " + e.message + " (schema.sql bien exécuté ?)"; return; }
+  if (!D.profil) return ecran("init");
+  ecran("app"); rendre(); };
+sb.auth.onAuthStateChange((ev, session) => {
+  if (!session) { lance = false; D = {}; return ecran("login"); }
+  if (lance) return; lance = true; setTimeout(demarrer, 0);
+});
+// Retour sur l'application après minuit : recalcul du jour
+document.addEventListener("visibilitychange", () => { if (!document.hidden && D.profil) maj(); });
+</script>
+</body></html>
