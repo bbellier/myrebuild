@@ -1,277 +1,284 @@
 <!DOCTYPE html>
 <html lang="fr"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#12122a"><meta name="apple-mobile-web-app-capable" content="yes"><title>REBUILD — Académie</title>
+<meta name="theme-color" content="#060b11"><meta name="apple-mobile-web-app-capable" content="yes"><title>REBUILD — Classée</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=IM+Fell+English:ital@0;1&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Marcellus+SC&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-/* ===== Direction artistique : carnet d'explorateur, carte d'aventure, nuit forestière ===== */
-:root{--nuit:#12122a;--nuit2:#23213f;--foret:#5c1a26;--emer:#2b6e58;--turq:#3d6f9e;--creme:#f1e4c3;--papier:#fbf3de;--parch:#efdfb8;--or:#b8862b;--or2:#e9c56b;--encre:#2a2015;--gris:#7b6a52;--ligne:#d6c196;--rouge:#8e2232;--orange:#c27a2c;--r:8px;
-  --grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .24 0 0 0 0 .1 0 0 0 .1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  --boussole:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2l2.2 6.8L21 12l-6.8 2.2L12 22l-2.2-7.8L3 12l6.8-3.2z' fill='%23b8862b' stroke='%235c1a26' stroke-width='.8'/%3E%3Ccircle cx='19' cy='4' r='1.3' fill='%23b8862b'/%3E%3Ccircle cx='4.5' cy='19' r='1' fill='%23b8862b'/%3E%3C/svg%3E")}
+/* ===== Direction artistique : partie classée, panneaux sombres bordés d'or, hexagones ===== */
+:root{--fond:#0a1119;--pan:#111c28;--pan2:#172534;--ligne:#2b3d50;--or:#c8a45a;--or2:#f0d58c;--teal:#1fc8b8;--teal2:#0d7f78;--texte:#ece6d6;--gris:#8e98a4;--rouge:#e5485d;--orange:#e89a3c;--vert:#3ccb83;--noir:#05090e;
+  --hex:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='97' viewBox='0 0 56 97'%3E%3Cpath d='M28 0 56 16v32L28 64 0 48V16zM28 64v33' fill='none' stroke='%231d2c3c' stroke-width='1'/%3E%3C/svg%3E");
+  --coin:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px)}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font:15px/1.5 Manrope,system-ui,sans-serif;color:var(--encre);background:var(--grain),radial-gradient(ellipse at 50% 0%,#f6ebd2 0%,#ecdbb3 65%,#dcc590 100%) fixed;min-height:100vh;-webkit-tap-highlight-color:transparent}
-h1,h2,h3,h4,.serif{font-family:Cinzel,Georgia,serif;font-weight:800;letter-spacing:.01em}
-.plume{font-family:"IM Fell English",Georgia,serif;font-style:italic}
-h2{font-size:1.18rem;margin:1.7rem 0 .7rem;display:flex;align-items:center;gap:.5rem;color:var(--foret)}
-h2:before{content:"";width:22px;height:22px;flex:none;background:var(--boussole) center/contain no-repeat}
-h2 small,h2 .lien{font:700 .75rem Manrope;color:var(--gris);margin-left:auto}
-h4{font-size:1rem;margin:1rem 0 .4rem;color:var(--foret)}
+body{font:15px/1.5 Manrope,system-ui,sans-serif;color:var(--texte);background:var(--hex),radial-gradient(ellipse at 50% -10%,#16304a 0%,var(--fond) 60%) fixed;background-color:var(--fond);min-height:100vh;-webkit-tap-highlight-color:transparent}
+h1,h2,h3,h4,.serif{font-family:"Marcellus SC",Georgia,serif;font-weight:400;letter-spacing:.04em}
+.plume{color:var(--teal)}
+h2{font-size:1.05rem;margin:1.7rem 0 .7rem;display:flex;align-items:center;gap:.55rem;color:var(--or2);text-transform:uppercase;letter-spacing:.1em}
+h2:before{content:"";width:10px;height:10px;flex:none;background:var(--or);transform:rotate(45deg);box-shadow:0 0 8px rgba(200,164,90,.7)}
+h2 small,h2 .lien{font:700 .75rem Manrope;color:var(--gris);margin-left:auto;text-transform:none;letter-spacing:0}
+h4{font-size:.95rem;margin:1rem 0 .4rem;color:var(--or2)}
 button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
-button:disabled{opacity:.45;cursor:not-allowed}
-input,select,textarea{font:inherit;width:100%;padding:.55rem .7rem;border:1.5px solid var(--ligne);border-radius:6px;background:#fffaf0;color:var(--encre)}
-input:focus,select:focus,textarea:focus{outline:2px solid var(--emer);border-color:transparent}
-label{font-size:.72rem;font-weight:800;color:var(--gris);display:block;margin-bottom:.2rem;text-transform:uppercase;letter-spacing:.06em}
+button:disabled{opacity:.4;cursor:not-allowed}
+input,select,textarea{font:inherit;width:100%;padding:.55rem .7rem;border:1px solid var(--ligne);border-radius:2px;background:#0b141e;color:var(--texte)}
+input:focus,select:focus,textarea:focus{outline:1px solid var(--teal);border-color:var(--teal);box-shadow:0 0 10px rgba(31,200,184,.3)}
+label{font-size:.7rem;font-weight:800;color:var(--or);display:block;margin-bottom:.2rem;text-transform:uppercase;letter-spacing:.08em}
 small{font-size:.78rem;color:var(--gris)}
 .hide{display:none!important}
 main{max-width:620px;margin:0 auto;padding:0 1rem calc(6.5rem + env(safe-area-inset-bottom))}
-h1.page{font-size:1.75rem;margin:1.3rem 0 .9rem;color:var(--foret);display:flex;align-items:center;gap:.6rem}
-h1.page:after{content:"";flex:1;height:2px;background:repeating-linear-gradient(90deg,var(--gris) 0 6px,transparent 6px 11px);opacity:.6}
-.carte{background:var(--grain),var(--papier);border:1.5px solid var(--ligne);border-radius:var(--r);padding:1rem;margin-bottom:.7rem;box-shadow:0 3px 0 -1px #d5bd88,0 8px 16px -10px rgba(60,40,10,.45)}
-.lien{color:var(--emer);font-weight:800;font-size:.85rem}
-.prim{background:var(--foret);color:var(--or2);padding:.6rem 1.1rem;border-radius:8px;font:800 1rem Cinzel,serif;letter-spacing:.03em;border:2px solid var(--encre);box-shadow:0 3px 0 var(--encre);transition:transform .1s,box-shadow .1s}
-.prim:active{transform:translateY(2px);box-shadow:0 1px 0 var(--encre)}
-.sec{background:var(--parch);border:1.5px solid var(--encre);padding:.5rem .95rem;border-radius:8px;font-weight:700;box-shadow:0 2px 0 var(--encre)}
+h1.page{font-size:1.6rem;margin:1.3rem 0 .9rem;color:var(--or2);text-transform:uppercase;letter-spacing:.1em;display:flex;align-items:center;gap:.7rem}
+h1.page:after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--or),transparent)}
+.carte{position:relative;background:linear-gradient(180deg,var(--pan2),var(--pan));border:1px solid var(--ligne);padding:1rem;margin-bottom:.7rem;clip-path:var(--coin);box-shadow:inset 0 1px 0 rgba(200,164,90,.35)}
+.lien{color:var(--teal);font-weight:800;font-size:.85rem}
+.prim{background:linear-gradient(180deg,#1d4048,#0f2228);color:#d6fffa;padding:.62rem 1.2rem;font:400 .95rem "Marcellus SC",serif;letter-spacing:.12em;text-transform:uppercase;border:2px solid var(--or);box-shadow:inset 0 0 12px rgba(31,200,184,.35),0 0 12px rgba(200,164,90,.25);transition:filter .15s}
+.prim:hover{filter:brightness(1.2)}.prim:active{filter:brightness(.9)}
+.sec{background:#0f1a25;border:1px solid var(--or);color:var(--or2);padding:.5rem .95rem;font-weight:700}
 .danger{color:var(--rouge);font-weight:800}
 .vide{color:var(--gris);font-size:.88rem;padding:.6rem 0;font-style:italic}
 .note{font-size:.8rem;color:var(--gris);margin-top:.4rem}
-.ok{color:var(--emer);font-weight:800;font-size:.9rem;margin-top:.5rem}
-.tampon{display:inline-block;font:800 .85rem Cinzel,serif;color:var(--rouge);border:2.5px double var(--rouge);border-radius:5px;padding:0 .5rem;transform:rotate(-7deg);opacity:.85;letter-spacing:.06em}
-/* Jauges : barres d'endurance graduées */
-.jauge{position:relative;height:13px;border-radius:3px;background:#e6d4a9;border:1.5px solid var(--encre);padding:1px;margin:.45rem 0 .25rem;overflow:hidden}
-.jauge:after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 calc(10% - 1px),rgba(42,32,21,.25) calc(10% - 1px) 10%);pointer-events:none}
-.jauge i{display:block;height:100%;border-radius:1px;background:linear-gradient(180deg,#5cc28a,#2a7d4f);box-shadow:inset 0 2px 0 rgba(255,255,255,.35);transition:width .9s cubic-bezier(.2,.8,.2,1)}
-.jauge.or i{background:linear-gradient(180deg,#f6d98a,#c08a2a)}
-.jauge.temps i{background:repeating-linear-gradient(135deg,#9a8565 0 5px,#b09c7a 5px 10px)}
-/* Héros : ciel nocturne, montagnes et carnet d'explorateur */
-.hero{position:relative;overflow:hidden;margin:0 -1rem;padding:calc(1rem + env(safe-area-inset-top)) 1.1rem 1.3rem;color:var(--creme);border-bottom:3px solid var(--encre);
-  background:radial-gradient(1.4px 1.4px at 18% 22%,#fffc 50%,transparent),radial-gradient(1px 1px at 33% 9%,#fff9 50%,transparent),radial-gradient(1.6px 1.6px at 58% 18%,#fffb 50%,transparent),radial-gradient(1px 1px at 76% 8%,#fff8 50%,transparent),radial-gradient(1.2px 1.2px at 90% 30%,#fffa 50%,transparent),radial-gradient(1px 1px at 8% 40%,#fff7 50%,transparent),radial-gradient(circle at calc(44% + 6px) 26px,#1b1a38 0 12px,transparent 13px),radial-gradient(circle at 44% 31px,#f6eac2 0 13px,transparent 14px),radial-gradient(circle at 44% 31px,rgba(246,234,194,.22) 0 22px,transparent 48px),radial-gradient(ellipse at 30% -10%,#3b2f63 0%,transparent 60%),linear-gradient(180deg,#0d0c20,#23213f 85%)}
+.ok{color:var(--teal);font-weight:800;font-size:.9rem;margin-top:.5rem}
+.tampon{display:inline-block;font:400 .85rem "Marcellus SC",serif;color:var(--or2);border:1px solid var(--or);background:rgba(200,164,90,.12);padding:.05rem .55rem;letter-spacing:.12em;text-transform:uppercase}
+/* Jauges segmentées lumineuses */
+.jauge{position:relative;height:10px;background:#081018;border:1px solid #2b3d50;margin:.45rem 0 .25rem;overflow:hidden}
+.jauge:after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 calc(10% - 2px),#081018 calc(10% - 2px) 10%);pointer-events:none}
+.jauge i{display:block;height:100%;background:linear-gradient(90deg,var(--teal2),var(--teal));box-shadow:0 0 10px rgba(31,200,184,.7);transition:width .9s cubic-bezier(.2,.8,.2,1)}
+.jauge.or i{background:linear-gradient(90deg,#8c6c2c,var(--or2));box-shadow:0 0 10px rgba(240,213,140,.6)}
+.jauge.temps i{background:repeating-linear-gradient(135deg,#4c5a68 0 5px,#5f6e7d 5px 10px);box-shadow:none}
+/* Héros : profil de classement */
+.hero{position:relative;overflow:hidden;margin:0 -1rem;padding:calc(1rem + env(safe-area-inset-top)) 1.1rem 1.2rem;border-bottom:1px solid var(--or);
+  background:radial-gradient(ellipse at 50% 120%,rgba(31,200,184,.18),transparent 60%),radial-gradient(ellipse at 50% 30%,rgba(200,164,90,.12),transparent 55%),var(--hex),linear-gradient(180deg,#060b11,#0f1d2b)}
 .hero>*{position:relative;z-index:1}
-.hero .montagnes{position:absolute;z-index:0;left:0;bottom:0;width:100%;height:110px}
 .hero-haut{display:flex;align-items:center;gap:.6rem}
-.marque{font:800 .85rem Cinzel,serif;letter-spacing:.32em;color:var(--or2)}
-.hero-haut .date{margin-left:auto;font-size:.8rem;opacity:.75;text-transform:capitalize}
-.avatar{width:44px;height:44px;flex:none}
-.licence{display:flex;gap:.9rem;align-items:center;margin-top:1rem;background:var(--grain),var(--papier);color:var(--encre);border:2px solid var(--encre);border-radius:10px;padding:.9rem;outline:1.5px dashed #c4a86e;outline-offset:-7px;box-shadow:0 6px 0 -2px #000a}
-.lic-g{display:flex;flex-direction:column;align-items:center;gap:.35rem}
-.lic-g .avatar{width:64px;height:64px}
-.rang{font:800 .72rem Cinzel,serif;letter-spacing:.08em;color:var(--or2);background:var(--encre);padding:.15rem .55rem;clip-path:polygon(8% 0,92% 0,100% 50%,92% 100%,8% 100%,0 50%)}
+.marque{font:400 .9rem "Marcellus SC",serif;letter-spacing:.35em;color:var(--or2)}
+.hero-haut .date{margin-left:auto;font-size:.8rem;color:var(--gris);text-transform:capitalize}
+.avatar{width:40px;height:40px;flex:none}
+.licence{display:flex;gap:1rem;align-items:center;margin-top:1rem}
+.lic-g{display:flex;flex-direction:column;align-items:center;gap:.2rem;flex:none}
+.lic-g .emb{filter:drop-shadow(0 0 14px var(--glow,rgba(31,200,184,.5)))}
+.rang{font:400 .78rem "Marcellus SC",serif;letter-spacing:.1em;color:var(--or2);text-transform:uppercase}
 .lic-d{flex:1;min-width:0}
-.lic-d small{display:block;text-transform:uppercase;letter-spacing:.08em;font-size:.65rem;font-weight:800}
-.lic-d .nom{display:block;font:800 1.35rem/1.1 Cinzel,serif}
-.lic-d .lieu{display:block;font:italic 400 1.07rem/1.1 "IM Fell English",Georgia,serif;color:var(--foret);margin:.15rem 0}
-.lic-d .jx{font-size:.8rem;font-weight:700;color:var(--gris)}
-.hero .jauge{background:rgba(0,0,0,.4);border-color:var(--or2);margin-top:1rem}
-.hero .jauge:after{background:repeating-linear-gradient(90deg,transparent 0 calc(10% - 1px),rgba(240,213,138,.25) calc(10% - 1px) 10%)}
-.hero .xp{display:flex;justify-content:space-between;font-size:.78rem;font-weight:700;color:var(--or2)}
-.barre{position:sticky;top:0;z-index:5;background:rgba(18,18,42,.96);backdrop-filter:blur(8px);margin:0 -1rem;padding:calc(.55rem + env(safe-area-inset-top)) 1rem .55rem;display:flex;align-items:center;gap:.7rem;border-bottom:3px solid var(--encre);color:var(--creme)}
-.barre span{font-size:.8rem;font-weight:800;color:#cdbb92}
+.lic-d small{display:block;text-transform:uppercase;letter-spacing:.12em;font-size:.65rem;font-weight:800;color:var(--teal)}
+.lic-d .nom{display:block;font:400 1.6rem/1.1 "Marcellus SC",serif;color:var(--texte)}
+.lic-d .lieu{display:block;font-weight:800;color:var(--or2);margin:.2rem 0;font-size:.95rem}
+.lic-d .jx{font-size:.8rem;color:var(--gris)}
+.hero .jauge{margin-top:1rem;height:12px;border-color:var(--or)}
+.hero .xp{display:flex;justify-content:space-between;font-size:.78rem;font-weight:800;color:var(--or2)}
+.hero .xp span:last-child{color:var(--gris)}
+.echelle{display:flex;justify-content:space-between;align-items:flex-end;margin-top:1rem;padding-top:.8rem;border-top:1px solid #1f2f40}
+.echelle div{display:flex;flex-direction:column;align-items:center;gap:.15rem;font:400 0 "Marcellus SC",serif;letter-spacing:.06em;color:var(--gris);text-transform:uppercase;width:12.5%}
+.echelle div.ici{font-size:.62rem;white-space:nowrap}
+.echelle .emb{opacity:.35;filter:grayscale(.7)}
+.echelle .fait .emb{opacity:.85;filter:none}
+.echelle .ici{color:var(--or2)}.echelle .ici .emb{opacity:1;filter:drop-shadow(0 0 8px var(--glow))}
+.barre{position:sticky;top:0;z-index:5;background:rgba(6,11,17,.96);backdrop-filter:blur(8px);margin:0 -1rem;padding:calc(.55rem + env(safe-area-inset-top)) 1rem .55rem;display:flex;align-items:center;gap:.7rem;border-bottom:1px solid var(--or)}
+.barre span{font-size:.8rem;font-weight:800;color:var(--gris)}
 .barre button{margin-left:auto}.barre .avatar{width:32px;height:32px}
-/* Notes de route */
-.alerte{display:flex;gap:.6rem;background:var(--grain),#fff8e2;border:1.5px dashed var(--gris);border-radius:6px;padding:.75rem .9rem;margin-top:.9rem;font-size:.88rem;box-shadow:0 3px 8px -6px #0006}
-.alerte.att{background:var(--grain),#fbe8cf;border-color:var(--orange)}
-/* Avis de quête */
-.quete{position:relative;display:flex;gap:.75rem;align-items:center;background:var(--grain),var(--papier);border:1.5px solid var(--ligne);border-left:6px solid var(--emer);border-radius:6px;padding:.7rem .75rem;margin-bottom:.6rem;box-shadow:0 3px 0 -1px #d5bd88;transition:background .3s}
-.quete.cat-medicale{border-left-color:var(--rouge)}.quete.cat-suivi{border-left-color:var(--turq)}.quete.cat-administrative{border-left-color:var(--gris)}.quete.cat-recuperation{border-left-color:#6b78a8}.quete.cat-rdv{border-left-color:var(--or)}
-.quete.finie{background:var(--grain),#f1e8cc}
-.quete.finie .q-corps{opacity:.75}
-.quete.finie:after{content:"Réussi";position:absolute;right:4.6rem;top:-.7rem;font:800 .78rem Cinzel,serif;letter-spacing:.08em;color:var(--rouge);background:var(--papier);border:2.5px double var(--rouge);border-radius:5px;padding:0 .45rem;transform:rotate(-5deg);pointer-events:none;animation:tampon .4s cubic-bezier(.2,1.5,.4,1)}
-@keyframes tampon{from{transform:rotate(-5deg) scale(2.2);opacity:0}}
-.quete.reportee,.quete.suspendue{opacity:.6}
-.q-ico{width:42px;height:42px;flex:none;border-radius:50%;background:var(--parch);border:1.5px solid var(--encre);display:grid;place-items:center;font-size:1.2rem}
+/* Alertes */
+.alerte{display:flex;gap:.6rem;background:rgba(31,200,184,.08);border:1px solid rgba(31,200,184,.4);border-left:3px solid var(--teal);padding:.75rem .9rem;margin-top:.9rem;font-size:.88rem}
+.alerte.att{background:rgba(232,154,60,.08);border-color:rgba(232,154,60,.45);border-left-color:var(--orange)}
+/* Défis */
+.quete{position:relative;display:flex;gap:.75rem;align-items:center;background:linear-gradient(90deg,var(--pan2),var(--pan));border:1px solid var(--ligne);border-left:3px solid var(--teal);padding:.7rem .75rem;margin-bottom:.55rem;clip-path:var(--coin);transition:background .3s}
+.quete.cat-medicale{border-left-color:var(--rouge)}.quete.cat-suivi{border-left-color:#7f8cff}.quete.cat-administrative{border-left-color:var(--gris)}.quete.cat-recuperation{border-left-color:#b07cff}.quete.cat-rdv{border-left-color:var(--or)}
+.quete.finie{background:linear-gradient(90deg,rgba(31,200,184,.14),var(--pan));border-color:rgba(31,200,184,.45)}
+.quete.finie .q-corps{opacity:.7}
+.quete.finie .q-act:after{content:"Victoire";font:400 .7rem "Marcellus SC",serif;letter-spacing:.18em;text-transform:uppercase;color:var(--or2);text-shadow:0 0 8px rgba(240,213,140,.8);pointer-events:none;animation:victoire .5s ease-out}
+@keyframes victoire{from{opacity:0;letter-spacing:.6em}}
+.quete.reportee,.quete.suspendue{opacity:.55}
+.q-ico{width:42px;height:42px;flex:none;display:grid;place-items:center;font-size:1.2rem;background:#0b141e;border:1px solid var(--or);clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%)}
 .q-corps{flex:1;min-width:0;cursor:pointer}
 .q-corps b{display:block;font-size:.95rem}
 .q-corps small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .q-act{display:flex;flex-direction:column;align-items:flex-end;gap:.35rem}
 .q-act div{display:flex;gap:.3rem}
-.xp-tag{font:800 .72rem Cinzel,serif;color:#4d3608;background:linear-gradient(135deg,var(--or2),var(--or));padding:.08rem .5rem;border-radius:99px;border:1px solid #8a6416;white-space:nowrap}
-.valide{width:34px;height:34px;border-radius:50%;border:2px dashed var(--gris);color:transparent;font-weight:900;transition:all .25s}
-.valide.on{background:var(--emer);border:2px solid var(--encre);color:#fff;transform:scale(1.05)}
-.mini{font-size:.75rem;font-weight:800;padding:.3rem .5rem;border-radius:6px;background:var(--parch);border:1.5px solid var(--encre)}
+.xp-tag{font-size:.7rem;font-weight:800;color:var(--or2);background:rgba(200,164,90,.12);border:1px solid rgba(200,164,90,.55);padding:.05rem .45rem;white-space:nowrap}
+.valide{width:34px;height:36px;color:transparent;font-weight:900;background:#1d2b3a;clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);transition:all .25s;box-shadow:inset 0 0 0 2px var(--ligne)}
+.valide.on{background:linear-gradient(180deg,var(--teal),var(--teal2));color:#04201d;transform:scale(1.06)}
+.mini{font-size:.75rem;font-weight:800;padding:.3rem .5rem;background:#0b141e;border:1px solid var(--teal);color:var(--teal)}
 .nav-jour{display:flex;align-items:center;justify-content:space-between;margin:.4rem 0 .6rem}
-.nav-jour button{font-size:1.3rem;padding:.2rem .7rem}
+.nav-jour button{font-size:1.3rem;padding:.2rem .7rem;color:var(--or2)}
 /* Onglets */
-.seg{display:flex;background:var(--parch);border:1.5px solid var(--encre);border-radius:8px;padding:3px;margin-bottom:.9rem}
-.seg button{flex:1;padding:.45rem;border-radius:5px;font:800 .95rem Cinzel,serif;color:var(--gris)}
-.seg button.on{background:var(--foret);color:var(--or2)}
-/* Mini-carte du parcours */
-.carte-map{position:relative;overflow:hidden;background:var(--grain),radial-gradient(ellipse at 30% 40%,#f6ead0,#e8d4a4);padding:.8rem .4rem}
+.seg{display:flex;border:1px solid var(--ligne);background:#0b141e;margin-bottom:.9rem}
+.seg button{flex:1;padding:.5rem;font:400 .85rem "Marcellus SC",serif;letter-spacing:.08em;text-transform:uppercase;color:var(--gris);border-bottom:2px solid transparent}
+.seg button.on{color:var(--or2);border-bottom-color:var(--or);background:linear-gradient(0deg,rgba(200,164,90,.15),transparent)}
+/* Plateau des étapes */
+.carte-map{padding:.8rem .4rem;background:radial-gradient(ellipse at 50% 50%,rgba(31,200,184,.08),transparent 70%),var(--hex),linear-gradient(180deg,var(--pan2),var(--pan))}
 .parcours{position:relative;display:flex;justify-content:space-between;height:98px}
 .parcours .chemin{position:absolute;inset:0;width:100%;height:100%}
+.parcours .chemin path{stroke:#3a5068}
 .etape{position:relative;display:flex;flex-direction:column;align-items:center;width:20%;text-align:center;gap:.2rem}
 .etape:nth-of-type(odd){margin-top:28px}
-.carte-map .lieu-actuel{text-align:center;font:italic 400 1.02rem "IM Fell English",Georgia,serif;color:var(--foret);margin-top:.2rem}
-.etape span{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:var(--papier);border:2px solid var(--encre);font-size:1.15rem}
-.etape small{font:800 .85rem Cinzel,serif;color:var(--encre)}
-.etape.c span{background:var(--foret);box-shadow:0 0 0 4px rgba(233,197,107,.35),0 0 22px rgba(233,197,107,.65)}
-.etape.v span{background:radial-gradient(circle at 35% 30%,var(--or2),var(--or) 65%,#8a6416);color:#fff;font-size:1.3rem}
-.etape.l span{background:#e7d9b6;border:2px dashed #9a8a6b;filter:grayscale(1)}
-.etape.l small{opacity:.55}
+.carte-map .lieu-actuel{text-align:center;font:400 1rem "Marcellus SC",serif;letter-spacing:.06em;color:var(--or2);margin-top:.2rem}
+.etape span{width:46px;height:50px;display:grid;place-items:center;background:#0b141e;font-size:1.15rem;clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);box-shadow:inset 0 0 0 2px var(--ligne)}
+.etape small{font:400 .85rem "Marcellus SC",serif;color:var(--gris)}
+.etape.c span{background:linear-gradient(180deg,#1d4a50,#0d2a2e);box-shadow:inset 0 0 0 2px var(--teal),inset 0 0 14px rgba(31,200,184,.6)}
+.etape.c small{color:var(--teal)}
+.etape.v span{background:linear-gradient(180deg,var(--or2),#8c6c2c);color:#1b1408}
+.etape.l span{filter:grayscale(1);opacity:.6}
 /* Progressions */
-.prog-l{display:flex;gap:.7rem;align-items:flex-start;padding:.6rem 0;border-bottom:1.5px dashed var(--ligne)}
+.prog-l{display:flex;gap:.7rem;align-items:flex-start;padding:.6rem 0;border-bottom:1px solid #1f2f40}
 .prog-l:last-of-type{border:0}
 .prog-l>span{font-size:1.1rem;width:1.6rem;text-align:center}
 .prog-l div{flex:1}
-.prog-l b{font:800 1rem Cinzel,serif}
+.prog-l b{font:400 .95rem "Marcellus SC",serif;letter-spacing:.06em;color:var(--or2)}
 .prog-l small{display:block}
 /* Événements */
-.evt{display:flex;gap:.75rem;align-items:center;padding:.55rem 0;border-bottom:1.5px dashed var(--ligne);cursor:pointer;width:100%;text-align:left}
+.evt{display:flex;gap:.75rem;align-items:center;padding:.55rem 0;border-bottom:1px solid #1f2f40;cursor:pointer;width:100%;text-align:left}
 .evt:last-child{border:0}
-.evt .cal{width:44px;flex:none;text-align:center;background:var(--parch);border:1.5px solid var(--encre);border-radius:5px;padding:.2rem 0;line-height:1.1}
-.evt .cal b{display:block;font:800 1.15rem Cinzel,serif}
-.evt .cal small{font-size:.62rem;font-weight:800;text-transform:uppercase}
+.evt .cal{width:44px;flex:none;text-align:center;background:#0b141e;border:1px solid var(--or);padding:.2rem 0;line-height:1.1}
+.evt .cal b{display:block;font:400 1.15rem "Marcellus SC",serif;color:var(--or2)}
+.evt .cal small{font-size:.6rem;font-weight:800;text-transform:uppercase}
 .evt div{flex:1;min-width:0}
-.evt.fait,.evt.realise{opacity:.6}
-.evt.annule{text-decoration:line-through;opacity:.45}
-/* Récompenses et badges */
+.evt.fait,.evt.realise{opacity:.55}
+.evt.annule{text-decoration:line-through;opacity:.4}
+/* Récompenses et succès */
 .recomp{display:grid;grid-template-columns:1fr 1fr;gap:.55rem}
-.recomp div{background:var(--grain),var(--papier);border:1.5px solid var(--ligne);border-radius:8px;padding:.75rem;box-shadow:0 3px 0 -1px #d5bd88}
-.recomp b{display:block;font:800 1rem Cinzel,serif;margin-top:.15rem}
+.recomp div{background:linear-gradient(180deg,var(--pan2),var(--pan));border:1px solid var(--ligne);padding:.75rem;clip-path:var(--coin)}
+.recomp b{display:block;font:400 .95rem "Marcellus SC",serif;letter-spacing:.04em;margin-top:.15rem;color:var(--or2)}
 .badges{display:flex;flex-wrap:wrap;gap:.45rem}
-.badge{display:flex;align-items:center;gap:.4rem;padding:.35rem .7rem;border-radius:99px;background:var(--parch);border:1.5px dashed var(--ligne);font-size:.78rem;font-weight:800;color:var(--gris)}
-.badge:not(.on){filter:grayscale(1);opacity:.7}
-.badge.on{background:linear-gradient(135deg,#f6dd9a,#e2b552);border:1.5px solid #8a6416;color:#4d3608}
-/* Carte d'aventure : chapitres */
+.badge{display:flex;align-items:center;gap:.4rem;padding:.35rem .7rem;background:#0b141e;border:1px solid var(--ligne);font-size:.78rem;font-weight:800;color:var(--gris)}
+.badge:not(.on){filter:grayscale(1);opacity:.55}
+.badge.on{border-color:var(--or);color:var(--or2);background:rgba(200,164,90,.1);box-shadow:0 0 10px rgba(200,164,90,.25)}
+/* Étapes (anciennement chapitres) */
 .trail{position:relative;padding-left:.2rem}
-.trail:before{content:"";position:absolute;left:1.6rem;top:1rem;bottom:1rem;border-left:2.5px dashed var(--gris);opacity:.7}
+.trail:before{content:"";position:absolute;left:1.6rem;top:1rem;bottom:1rem;border-left:2px solid #22344a}
 .chapitre{position:relative;display:flex;gap:.8rem;margin-bottom:1rem}
-.sceau{position:relative;z-index:1;width:48px;height:48px;flex:none;border-radius:50%;display:grid;place-items:center;background:var(--papier);border:2px solid var(--encre);font:800 1rem Cinzel,serif}
-.chapitre.c .sceau{background:var(--foret);color:var(--or2);box-shadow:0 0 0 4px rgba(233,197,107,.35),0 0 22px rgba(233,197,107,.6)}
-.chapitre.v .sceau{background:radial-gradient(circle at 35% 30%,var(--or2),var(--or) 65%,#8a6416);color:#fff}
-.chapitre.l .ch-corps{opacity:.6;filter:grayscale(.6)}
-.ch-corps{flex:1;background:var(--grain),var(--papier);border:1.5px solid var(--ligne);border-radius:8px;padding:.85rem 1rem;box-shadow:0 3px 0 -1px #d5bd88}
-.chapitre.c .ch-corps{border:2px solid var(--or);box-shadow:0 3px 0 -1px #d5bd88,0 0 24px -6px rgba(233,197,107,.7)}
+.sceau{position:relative;z-index:1;width:48px;height:54px;flex:none;display:grid;place-items:center;background:#0b141e;font:400 1.1rem "Marcellus SC",serif;color:var(--gris);clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);box-shadow:inset 0 0 0 2px var(--ligne)}
+.chapitre.c .sceau{background:linear-gradient(180deg,#1d4a50,#0d2a2e);color:var(--teal);box-shadow:inset 0 0 0 2px var(--teal),inset 0 0 14px rgba(31,200,184,.6)}
+.chapitre.v .sceau{background:linear-gradient(180deg,var(--or2),#8c6c2c);color:#1b1408}
+.chapitre.l .ch-corps{opacity:.55}
+.ch-corps{flex:1;background:linear-gradient(180deg,var(--pan2),var(--pan));border:1px solid var(--ligne);padding:.85rem 1rem;clip-path:var(--coin)}
+.chapitre.c .ch-corps{border-color:var(--teal);box-shadow:inset 0 0 20px rgba(31,200,184,.12)}
 .ch-tete{cursor:pointer}
-.ch-tete small{text-transform:uppercase;letter-spacing:.06em;font-size:.68rem;font-weight:800}
-.ch-tete h3{font-size:1.25rem;margin:.1rem 0;color:var(--foret)}
-.ch-tete p{font:italic 400 0.94rem/1.2 "IM Fell English",Georgia,serif;color:var(--gris)}
+.ch-tete small{text-transform:uppercase;letter-spacing:.1em;font-size:.66rem;font-weight:800;color:var(--teal)}
+.ch-tete h3{font-size:1.2rem;margin:.1rem 0;color:var(--or2)}
+.ch-tete p{color:var(--gris);font-size:.88rem}
 .desc{font-size:.86rem;margin:.6rem 0}
-.restr{font-size:.82rem;background:#fbe8cf;border:1.5px dashed var(--orange);border-radius:6px;padding:.55rem .7rem;margin:.5rem 0}
-.restr b{display:block;font:800 .8rem Cinzel,serif;letter-spacing:.05em;color:var(--rouge)}
+.restr{font-size:.82rem;background:rgba(229,72,93,.08);border:1px solid rgba(229,72,93,.4);border-left:3px solid var(--rouge);padding:.55rem .7rem;margin:.5rem 0}
+.restr b{display:block;font:400 .78rem "Marcellus SC",serif;letter-spacing:.1em;color:var(--rouge);text-transform:uppercase}
 .mini-pal{display:flex;gap:4px;margin-top:.5rem}
-.mini-pal i{flex:1;height:7px;border-radius:2px;background:#e6d4a9;border:1px solid var(--ligne)}
-.mini-pal i.valide{background:var(--or)}.mini-pal i.actif{background:var(--emer)}.mini-pal i.suspendu{background:var(--orange)}
-.palier{display:flex;align-items:center;gap:.6rem;width:100%;text-align:left;padding:.55rem .6rem;border-radius:6px;background:var(--parch);border:1.5px solid var(--ligne);margin-top:.45rem}
-.palier .code{font:800 .82rem Cinzel,serif;background:var(--papier);border:1.5px solid var(--encre);border-radius:5px;padding:.1rem .4rem}
+.mini-pal i{flex:1;height:5px;background:#1d2b3a}
+.mini-pal i.valide{background:var(--or)}.mini-pal i.actif{background:var(--teal);box-shadow:0 0 6px var(--teal)}.mini-pal i.suspendu{background:var(--orange)}
+.palier{display:flex;align-items:center;gap:.6rem;width:100%;text-align:left;padding:.55rem .6rem;background:#0b141e;border:1px solid var(--ligne);margin-top:.45rem}
+.palier .code{font:400 .82rem "Marcellus SC",serif;color:var(--or2);border:1px solid var(--or);padding:.05rem .4rem;white-space:nowrap}
 .palier span:nth-child(2){flex:1;font-weight:700;font-size:.88rem}
-.palier.actif{background:#f6e7c4;border:2px solid var(--or)}
-.palier.valide .code{background:var(--or2);border-color:#8a6416;color:#4d3608}
-.palier.verrouille{opacity:.55}
-.palier.suspendu{background:#fbe8cf;border-color:var(--orange)}
+.palier.actif{border-color:var(--teal);box-shadow:inset 0 0 14px rgba(31,200,184,.2)}
+.palier.valide .code{background:var(--or);color:#1b1408}
+.palier.verrouille{opacity:.5}
+.palier.suspendu{border-color:var(--orange)}
 /* Critères */
-.crit{display:flex;gap:.6rem;align-items:center;width:100%;text-align:left;padding:.55rem 0;border-bottom:1.5px dashed var(--ligne)}
+.crit{display:flex;gap:.6rem;align-items:center;width:100%;text-align:left;padding:.55rem 0;border-bottom:1px solid #1f2f40}
 .crit span:nth-child(2){flex:1}.crit b{display:block;font-size:.88rem}.crit small{display:block}
 .crit em{font-style:normal;font-size:.72rem;font-weight:800;white-space:nowrap}
-.pastille{width:13px;height:13px;border-radius:50%;flex:none;background:#d6c7a5;border:1.5px solid var(--encre)}
-.crit.atteint .pastille{background:var(--emer)}.crit.non_atteint .pastille{background:var(--orange)}.crit.non_applicable .pastille{background:#a9a08c}
-.crit.atteint em{color:var(--emer)}.crit.non_atteint em{color:var(--orange)}
-.bloc-valid{background:var(--parch);border:1.5px dashed var(--gris);border-radius:6px;padding:.7rem .8rem;margin-top:.8rem;font-size:.85rem}
+.pastille{width:12px;height:12px;flex:none;background:#2b3d50;transform:rotate(45deg)}
+.crit.atteint .pastille{background:var(--teal);box-shadow:0 0 8px var(--teal)}.crit.non_atteint .pastille{background:var(--orange)}.crit.non_applicable .pastille{background:#56606b}
+.crit.atteint em{color:var(--teal)}.crit.non_atteint em{color:var(--orange)}
+.bloc-valid{background:#0b141e;border:1px solid var(--ligne);border-left:3px solid var(--or);padding:.7rem .8rem;margin-top:.8rem;font-size:.85rem}
 .bloc-valid ul{margin:.3rem 0 0 1.1rem}
 /* Soins */
 .soin-tete{display:flex;gap:.7rem;align-items:center}
-.soin-tete div{flex:1}.soin-tete b{display:block;font:800 1.05rem Cinzel,serif}
+.soin-tete div{flex:1}.soin-tete b{display:block;font:400 1.02rem "Marcellus SC",serif;letter-spacing:.04em;color:var(--or2)}
 .prog{display:flex;justify-content:space-between;align-items:baseline;margin-top:.8rem;font-size:.85rem}
-.prog b{font:800 1.3rem Cinzel,serif}
-.slots{display:flex;flex-wrap:wrap;gap:5px;margin:.55rem 0 .2rem}
-.slot{width:20px;height:20px;border-radius:50%;background:#e6d4a9;border:1.5px dashed var(--gris);transition:background .3s}
-.slot.realise{background:var(--emer);border:1.5px solid var(--encre)}.slot.oublie{background:var(--orange);border:1.5px solid var(--encre)}.slot.retard{border:2px solid var(--orange)}.slot.auj{border:2px solid var(--encre)}
+.prog b{font:400 1.3rem "Marcellus SC",serif;color:var(--texte)}
+.slots{display:flex;flex-wrap:wrap;gap:4px;margin:.55rem 0 .2rem}
+.slot{width:18px;height:20px;background:#1d2b3a;clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);transition:background .3s}
+.slot.realise{background:var(--teal)}.slot.oublie{background:var(--orange)}.slot.retard{background:#5a3a1c}.slot.auj{background:#3d5368;outline:0}
 .recap{display:grid;grid-template-columns:repeat(4,1fr);gap:.4rem;text-align:center;margin:.6rem 0}
-.recap div{background:var(--parch);border:1.5px solid var(--ligne);border-radius:6px;padding:.5rem .2rem}
-.recap b{display:block;font:800 1.35rem Cinzel,serif}
-.recap small{font-size:.68rem}
+.recap div{background:#0b141e;border:1px solid var(--ligne);padding:.5rem .2rem}
+.recap b{display:block;font:400 1.35rem "Marcellus SC",serif;color:var(--or2)}
+.recap small{font-size:.66rem}
 details summary{cursor:pointer;font-size:.82rem;font-weight:800;color:var(--gris);margin-top:.6rem}
-.occ{display:flex;align-items:center;gap:.6rem;padding:.4rem 0;border-bottom:1.5px dashed var(--ligne);font-size:.85rem}
-.occ span{flex:1}.occ.annule{opacity:.45;text-decoration:line-through}
-.chip{font-size:.7rem;font-weight:800;padding:.1rem .5rem;border-radius:99px;background:var(--parch);border:1px solid var(--ligne);color:var(--gris)}
-.chip.realise,.chip.fait,.chip.terminee{background:#e0efe2;border-color:#9cc9a9;color:var(--emer)}.chip.oublie,.chip.retard{background:#fbe8cf;border-color:#e2b98a;color:var(--orange)}
+.occ{display:flex;align-items:center;gap:.6rem;padding:.4rem 0;border-bottom:1px solid #1f2f40;font-size:.85rem}
+.occ span{flex:1}.occ.annule{opacity:.4;text-decoration:line-through}
+.chip{font-size:.7rem;font-weight:800;padding:.08rem .5rem;background:#0b141e;border:1px solid var(--ligne);color:var(--gris)}
+.chip.realise,.chip.fait,.chip.terminee{border-color:var(--teal);color:var(--teal)}.chip.oublie,.chip.retard{border-color:var(--orange);color:var(--orange)}
 .acts{display:flex;gap:.5rem;align-items:center;margin-top:1rem;flex-wrap:wrap}
 .acts .sp{flex:1}
-/* Séances */
+/* Entraînement */
 .seance{cursor:pointer}
 .seance .ent{display:flex;justify-content:space-between;align-items:baseline}
+.seance .ent b{color:var(--or2)}
 .seance p{font-size:.85rem;margin-top:.35rem;white-space:pre-line}
 .indic{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.45rem}
-.obj{display:flex;gap:.6rem;align-items:center;padding:.45rem 0;border-bottom:1.5px dashed var(--ligne);font-size:.88rem}
+.obj{display:flex;gap:.6rem;align-items:center;padding:.45rem 0;border-bottom:1px solid #1f2f40;font-size:.88rem}
 .obj span{flex:1;cursor:pointer}
 /* Calendrier */
 .mois{display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem}
-.mois b{font:800 1.25rem Cinzel,serif;text-transform:capitalize}
-.mois button{font-size:1.3rem;padding:.2rem .8rem}
+.mois b{font:400 1.15rem "Marcellus SC",serif;text-transform:capitalize;letter-spacing:.06em;color:var(--or2)}
+.mois button{font-size:1.3rem;padding:.2rem .8rem;color:var(--or2)}
 .grille{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
-.grille .js{text-align:center;font:800 .75rem Cinzel,serif;color:var(--gris);padding:.2rem 0}
-.jour{aspect-ratio:1;border-radius:6px;background:var(--papier);border:1.5px solid var(--ligne);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:.85rem;font-weight:700}
-.jour.hors{opacity:.3}.jour.auj{border:2px solid var(--encre)}.jour.sel{background:var(--foret);color:var(--or2);border-color:var(--encre)}
-.points{display:flex;gap:2px;height:5px}.points i{width:5px;height:5px;border-radius:50%}
-.p-evt{background:var(--turq)}.p-soin{background:var(--rouge)}.p-seance{background:var(--emer)}.p-palier{background:var(--or)}
+.grille .js{text-align:center;font:400 .75rem "Marcellus SC",serif;color:var(--gris);padding:.2rem 0}
+.jour{aspect-ratio:1;background:var(--pan);border:1px solid var(--ligne);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:.85rem;font-weight:700}
+.jour.hors{opacity:.3}.jour.auj{border-color:var(--or)}.jour.sel{background:linear-gradient(180deg,#1d4a50,#0d2a2e);border-color:var(--teal);color:#d6fffa}
+.points{display:flex;gap:2px;height:5px}.points i{width:5px;height:5px;transform:rotate(45deg)}
+.p-evt{background:#7f8cff}.p-soin{background:var(--rouge)}.p-seance{background:var(--teal)}.p-palier{background:var(--or)}
 .legende{display:flex;gap:.8rem;flex-wrap:wrap;font-size:.72rem;color:var(--gris);margin:.5rem 0}
-.legende i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:.25rem}
+.legende i{display:inline-block;width:7px;height:7px;transform:rotate(45deg);margin-right:.35rem}
 .sem-j{margin-top:.7rem}.sem-j h4{font-size:.85rem;color:var(--gris);margin:.4rem 0 .1rem}
-/* Carnet */
+/* Profil */
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:.4rem;text-align:center}
-.stats div{background:var(--grain),var(--papier);border:1.5px solid var(--ligne);border-radius:6px;padding:.55rem .2rem}
-.stats b{display:block;font:800 1.3rem Cinzel,serif}.stats small{font-size:.68rem}
-.tl-j{margin-top:1rem}.tl-j h4{font-size:.85rem;color:var(--gris);margin:0 0 .3rem}
+.stats div{background:linear-gradient(180deg,var(--pan2),var(--pan));border:1px solid var(--ligne);padding:.55rem .2rem}
+.stats b{display:block;font:400 1.3rem "Marcellus SC",serif;color:var(--or2)}.stats small{font-size:.66rem}
+.tl-j{margin-top:1rem}.tl-j h4{font-size:.82rem;color:var(--gris);margin:0 0 .3rem}
 .tl{display:flex;gap:.6rem;padding:.35rem 0;font-size:.86rem}
-.tl.or b{color:#8a6416}
-/* Dialogues : pages de carnet */
-dialog{border:2px solid var(--encre);border-radius:10px;padding:0;width:min(560px,94vw);max-height:90vh;background:var(--grain),var(--papier);color:var(--encre);margin:auto;outline:1.5px dashed #c4a86e;outline-offset:-8px}
-dialog::backdrop{background:rgba(13,12,32,.72);backdrop-filter:blur(2px)}
+.tl.or b{color:var(--or2)}
+/* Dialogues */
+dialog{border:1px solid var(--or);padding:0;width:min(560px,94vw);max-height:90vh;background:linear-gradient(180deg,#132131,#0b141e);color:var(--texte);margin:auto;box-shadow:0 0 0 1px #000,0 0 40px rgba(31,200,184,.15)}
+dialog::backdrop{background:rgba(3,6,10,.78);backdrop-filter:blur(3px)}
 dialog form,.dlg-in{padding:1.3rem}
-dialog h3{font-size:1.35rem;margin:.1rem 0 .6rem;color:var(--foret)}
+dialog h3{font-size:1.25rem;margin:.1rem 0 .7rem;color:var(--or2);letter-spacing:.06em}
 .champs{display:grid;grid-template-columns:1fr 1fr;gap:.6rem .7rem}
 .champs .plein{grid-column:1/-1}
-.coche{display:flex;gap:.5rem;align-items:center;text-transform:none;font-size:.9rem;color:var(--encre);letter-spacing:0;font-weight:600}
-.coche input{width:auto;accent-color:var(--emer)}
-.curseur{display:flex;gap:.6rem;align-items:center}.curseur output{font:800 1rem Cinzel,serif;width:1.6rem;text-align:right}
-input[type=range]{padding:0;accent-color:var(--emer);border:0;background:none}
+.coche{display:flex;gap:.5rem;align-items:center;text-transform:none;font-size:.9rem;color:var(--texte);letter-spacing:0;font-weight:600}
+.coche input{width:auto;accent-color:var(--teal)}
+.curseur{display:flex;gap:.6rem;align-items:center}.curseur output{font:400 1rem "Marcellus SC",serif;color:var(--or2);width:1.6rem;text-align:right}
+input[type=range]{padding:0;accent-color:var(--teal);border:0;background:none}
 /* Navigation basse */
-nav{position:fixed;bottom:0;left:0;right:0;z-index:10;background:linear-gradient(180deg,#23213f,#0d0c20);border-top:3px solid var(--encre);display:flex;justify-content:center;padding:.4rem .3rem calc(.4rem + env(safe-area-inset-bottom))}
-nav button{position:relative;flex:1;max-width:100px;display:flex;flex-direction:column;align-items:center;gap:2px;font:800 .7rem Cinzel,serif;letter-spacing:.03em;color:#b6a57f;padding:.3rem 0}
+nav{position:fixed;bottom:0;left:0;right:0;z-index:10;background:linear-gradient(180deg,#0f1b28,#05090e);border-top:1px solid var(--or);display:flex;justify-content:center;padding:.4rem .3rem calc(.4rem + env(safe-area-inset-bottom))}
+nav button{position:relative;flex:1;max-width:100px;display:flex;flex-direction:column;align-items:center;gap:2px;font:400 .66rem "Marcellus SC",serif;letter-spacing:.06em;color:#6f7b88;padding:.3rem 0}
 nav svg{width:23px;height:23px}
-nav button.on{color:var(--or2)}
-nav button.on:before{content:"";position:absolute;top:-.62rem;width:9px;height:9px;background:var(--or2);transform:rotate(45deg);border:2px solid var(--encre)}
+nav button.on{color:var(--or2)}nav button.on svg{stroke:var(--teal);filter:drop-shadow(0 0 5px var(--teal))}
+nav button.on:before{content:"";position:absolute;top:-.45rem;left:25%;right:25%;height:2px;background:var(--teal);box-shadow:0 0 8px var(--teal)}
 /* Connexion et création du parcours */
-.ecran{min-height:100vh;display:grid;place-items:center;padding:1.5rem;color:var(--creme);
-  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 120' preserveAspectRatio='none'%3E%3Cpath d='M0 120V86l60-14 70 10 80-18 70 12 60-10 60 14v40Z' fill='%232c2850' opacity='.7'/%3E%3Cpath d='M0 120V96h40V80h10V64l9-16 9 16v16h14V90h30V70h8V52l12-24 12 24v18h8v20h26V62h10V40l14-28 14 28v22h10v28h30V76l10-18 10 18v14h22V84h12V60l11-22 11 22v24h16v12h28V82l8-14 8 14v38Z' fill='%2312112a'/%3E%3C/svg%3E") bottom/100% 35% no-repeat,radial-gradient(1.4px 1.4px at 18% 22%,#fffc 50%,transparent),radial-gradient(1px 1px at 63% 12%,#fff9 50%,transparent),radial-gradient(1.5px 1.5px at 82% 30%,#fffb 50%,transparent),radial-gradient(circle at 80.5% 14%,#1c1a3a 0 17px,transparent 18px),radial-gradient(circle at 78% 18%,#f6eac2 0 18px,transparent 19px),linear-gradient(180deg,#0d0c20,#23213f)}
-.ecran form{width:min(400px,100%);background:var(--grain),var(--papier);color:var(--encre);border:2px solid var(--encre);border-radius:10px;outline:1.5px dashed #c4a86e;outline-offset:-8px;padding:1.5rem;display:grid;gap:.7rem}
+.ecran{min-height:100vh;display:grid;place-items:center;padding:1.5rem;color:var(--texte);background:radial-gradient(ellipse at 50% 30%,rgba(31,200,184,.15),transparent 55%),var(--hex),linear-gradient(180deg,#060b11,#0f1d2b)}
+.ecran form{width:min(400px,100%);background:linear-gradient(180deg,#132131,#0b141e);border:1px solid var(--or);padding:1.5rem;display:grid;gap:.7rem;clip-path:var(--coin)}
 .ecran .titre{text-align:center;margin-bottom:1rem}
 .ecran .titre .marque{font-size:1.5rem;display:block;margin:.6rem 0 .2rem}
-.ecran .titre p{font:italic 400 1.07rem "IM Fell English",Georgia,serif;color:var(--or2)}
+.ecran .titre p{color:var(--teal);font-weight:700}
 .err{color:var(--rouge);font-size:.85rem;min-height:1em}
-/* Animations : XP, célébrations, notifications */
-.xp-pop{position:fixed;z-index:50;pointer-events:none;font:800 1.15rem Cinzel,serif;color:var(--or);text-shadow:0 0 6px #fff,0 1px 0 var(--encre);animation:monte 1.1s ease-out forwards}
+/* Animations */
+.xp-pop{position:fixed;z-index:50;pointer-events:none;font:400 1.15rem "Marcellus SC",serif;color:var(--or2);text-shadow:0 0 10px var(--or),0 0 2px #000;animation:monte 1.1s ease-out forwards}
 @keyframes monte{0%{opacity:0;transform:translate(-50%,0) scale(.8)}20%{opacity:1;transform:translate(-50%,-12px) scale(1.15)}100%{opacity:0;transform:translate(-50%,-64px)}}
-.fete{position:fixed;inset:0;z-index:40;display:grid;place-items:center;background:radial-gradient(circle,rgba(43,33,80,.92),rgba(10,9,24,.97));animation:fondu .3s}
-.fete-in{position:relative;text-align:center;color:var(--creme);padding:2rem;animation:pop .5s cubic-bezier(.2,1.4,.4,1)}
-.fete-in:before{content:"";position:absolute;left:50%;top:3.6rem;width:340px;height:340px;margin:-170px 0 0 -170px;border-radius:50%;background:repeating-conic-gradient(rgba(236,199,113,.16) 0 7deg,transparent 7deg 18deg);-webkit-mask:radial-gradient(circle,#000 20%,transparent 70%);mask:radial-gradient(circle,#000 20%,transparent 70%);animation:tourne 14s linear infinite;z-index:-1}
+.fete{position:fixed;inset:0;z-index:40;display:grid;place-items:center;background:radial-gradient(circle,rgba(16,40,52,.94),rgba(3,6,10,.98));animation:fondu .3s}
+.fete-in{position:relative;text-align:center;color:var(--texte);padding:2rem;animation:pop .55s cubic-bezier(.2,1.4,.4,1)}
+.fete-in:before{content:"";position:absolute;left:50%;top:4.5rem;width:360px;height:360px;margin:-180px 0 0 -180px;border-radius:50%;background:repeating-conic-gradient(rgba(240,213,140,.14) 0 6deg,transparent 6deg 15deg);-webkit-mask:radial-gradient(circle,#000 18%,transparent 70%);mask:radial-gradient(circle,#000 18%,transparent 70%);animation:tourne 16s linear infinite;z-index:-1}
 @keyframes tourne{to{transform:rotate(360deg)}}
-.fete-in .sceau-or{width:96px;height:96px;margin:0 auto 1rem;border-radius:50%;display:grid;place-items:center;font-size:2.4rem;color:#fff;border:3px solid var(--encre);background:radial-gradient(circle at 35% 30%,var(--or2),var(--or) 65%,#8a6416);box-shadow:0 0 0 8px rgba(236,199,113,.18),0 0 60px rgba(236,199,113,.6)}
-.fete-in h2{font-size:2rem;justify-content:center;margin:.3rem 0 1.2rem;color:var(--creme)}
+.fete-in .sceau-or{width:96px;height:104px;margin:0 auto 1rem;display:grid;place-items:center;font-size:2.4rem;color:#1b1408;background:linear-gradient(180deg,var(--or2),#8c6c2c);clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%)}
+.fete-in .sceau-or.nu{width:auto;height:auto;background:none;clip-path:none;filter:drop-shadow(0 0 24px var(--glow,rgba(240,213,140,.7)))}
+.fete-in h2{font-size:2rem;justify-content:center;margin:.3rem 0 1.2rem;color:var(--or2);text-shadow:0 0 18px rgba(240,213,140,.5)}
 .fete-in h2:before{display:none}
-.fete-in small{color:var(--or2);font:italic 400 1.07rem "IM Fell English",Georgia,serif}
+.fete-in small{color:var(--teal);font-weight:800;letter-spacing:.2em;text-transform:uppercase}
 @keyframes pop{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
 @keyframes fondu{from{opacity:0}}
-.toast{position:fixed;left:50%;bottom:calc(5.8rem + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:60;background:var(--nuit);color:var(--or2);border:2px solid var(--or);padding:.65rem 1rem;border-radius:8px;font-size:.88rem;font-weight:700;max-width:90vw;animation:fondu .3s}
-.toast.err{background:var(--rouge);color:#fff;border-color:var(--encre)}
+.toast{position:fixed;left:50%;bottom:calc(5.8rem + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:60;background:#0b141e;color:var(--or2);border:1px solid var(--or);padding:.65rem 1rem;font-size:.88rem;font-weight:700;max-width:90vw;animation:fondu .3s;box-shadow:0 0 18px rgba(200,164,90,.3)}
+.toast.err{border-color:var(--rouge);color:#ffd5db}
 .calme *,.calme *:before,.calme *:after{animation:none!important;transition:none!important}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-@media (min-width:700px){.hero{margin:0;border-radius:0 0 14px 14px;border:3px solid var(--encre);border-top:0}}
+@media (min-width:700px){.hero{margin:0;border:1px solid var(--or);border-top:0}}
 </style>
 </head>
 <body>
 
 <!-- ===== Connexion ===== -->
 <section id="login" class="ecran hide"><div>
-  <div class="titre"><svg class="avatar" style="width:64px;height:64px" viewBox="0 0 48 48"><use href="#av"/></svg><span class="marque">REBUILD</span><p>Ta reconstruction, année après année.</p></div>
+  <div class="titre"><svg class="avatar" style="width:64px;height:64px" viewBox="0 0 48 48"><use href="#av"/></svg><span class="marque">REBUILD</span><p>Grimpe les rangs, de Fer à Maître.</p></div>
   <form id="f-login"><div><label>Email</label><input id="l-mail" type="email" required autocomplete="username"></div>
     <div><label>Mot de passe</label><input id="l-mdp" type="password" required autocomplete="current-password"></div>
-    <p class="err" id="l-err"></p><button class="prim">Entrer à l'académie</button></form>
+    <p class="err" id="l-err"></p><button class="prim">Lancer la partie</button></form>
 </div></section>
 
 <!-- ===== Création du parcours (premier lancement) ===== -->
 <section id="init" class="ecran hide"><div>
-  <div class="titre"><svg class="avatar" style="width:64px;height:64px" viewBox="0 0 48 48"><use href="#av"/></svg><span class="marque">REBUILD</span><p>Ta lettre d'admission est arrivée…</p></div>
+  <div class="titre"><svg class="avatar" style="width:64px;height:64px" viewBox="0 0 48 48"><use href="#av"/></svg><span class="marque">REBUILD</span><p>Partie classée trouvée !</p></div>
   <form id="f-init">
     <div><label>Prénom</label><input id="i-prenom"></div>
     <div><label>Date de l'opération</label><input id="i-date" type="date" required></div>
@@ -279,7 +286,7 @@ nav button.on:before{content:"";position:absolute;top:-.62rem;width:9px;height:9
     <label class="coche"><input type="checkbox" id="i-inj" checked> Injections anticoagulantes : 1 par jour pendant 14 jours</label>
     <div><label>Première injection (vide = jour de l'opération)</label><input id="i-inj-d" type="date"></div>
     <p class="note">Les phases, paliers, critères et quêtes créés sont des exemples issus du protocole : ils restent modifiables et doivent être validés avec ton kiné.</p>
-    <p class="err" id="i-err"></p><button class="prim">Faire sa rentrée</button></form>
+    <p class="err" id="i-err"></p><button class="prim">Entrer en classée</button></form>
 </div></section>
 
 <!-- ===== Application ===== -->
@@ -291,10 +298,8 @@ nav button.on:before{content:"";position:absolute;top:-.62rem;width:9px;height:9
 <dialog id="dlg"></dialog>
 
 <!-- Avatar d'explorateur (dessin original) -->
-<svg width="0" height="0" style="position:absolute"><symbol id="av" viewBox="0 0 48 48">
-  <circle cx="24" cy="24" r="22.5" fill="#23213f" stroke="#b8862b" stroke-width="2"/><path d="M11 36c4-2 22-2 26 0 1 1-2 3-13 3s-14-2-13-3Z" fill="#5c1a26"/>
-  <path d="M15 35 25 9c1-2 3-1 3 1l-1 8 5 17Z" fill="#5c1a26"/><path d="M16.2 32h16.3l.7 2.6H15.3Z" fill="#e9c56b"/>
-  <path d="m35 9 1.2 3.1 3.1 1.2-3.1 1.2L35 17.6l-1.2-3.1-3.1-1.2 3.1-1.2Z" fill="#e9c56b"/><circle cx="12" cy="14" r="1.2" fill="#f6eac2"/><circle cx="38" cy="27" r="1" fill="#f6eac2"/></symbol></svg>
+<svg width="0" height="0" style="position:absolute"><symbol id="av" viewBox="0 0 48 48"><path d="M24 2 44 13v22L24 46 4 35V13Z" fill="#0b141e" stroke="#c8a45a" stroke-width="2"/>
+  <path d="M24 10 37 17v14l-13 7-13-7V17Z" fill="none" stroke="#1fc8b8" stroke-width="1.5"/><path d="m24 16 6 8-6 8-6-8Z" fill="#f0d58c"/></symbol></svg>
 
 <script>
 // ===== Configuration Supabase (Project Settings > API) =====
@@ -316,7 +321,7 @@ const hh = h => h ? h.slice(0, 5) : "";
 const pct = (a, b) => b ? Math.min(100, Math.round(a / b * 100)) : 0;
 const ok = r => { if (r.error) { toast("Erreur : " + r.error.message, true); throw r.error; } return r.data; };
 const toast = (m, err) => { const t = document.createElement("div"); t.className = "toast" + (err ? " err" : ""); t.textContent = m; document.body.append(t); setTimeout(() => t.remove(), 3800); };
-const AV = (c = "avatar") => `<svg class="${c}" viewBox="0 0 48 48"><use href="#av"/></svg>`;
+const AV = (c = "avatar") => D.xpTotal != null ? emblem(niveau(D.xpTotal).t, 40, c) : `<svg class="${c}" viewBox="0 0 48 48"><use href="#av"/></svg>`;
 
 // ===== Libellés =====
 const L = {
@@ -335,8 +340,20 @@ const L = {
   act: {insert:"création", update:"modification", delete:"suppression"}
 };
 const opts = o => Object.entries(o).map(([k, v]) => [k, Array.isArray(v) ? v[1] : v]);
-const ICO_PHASE = ["🕯️","📜","🧪","🔮","🏆"], ROM = ["I","II","III","IV","V","VI","VII","VIII"];
-const TITRES = ["Novice","Apprenti","Élève","Initié","Adepte","Érudit","Enchanteur","Archimage","Grand maître"];
+const ICO_PHASE = ["🛡️","⚔️","🔥","⚡","👑"], ROM = ["1","2","3","4","5","6","7","8"];
+// Rangs : [nom, couleur sombre, couleur claire, lueur]
+const TIERS = [["Fer","#3d3936","#9b918b","rgba(155,145,139,.5)"], ["Bronze","#5e3a22","#d0925f","rgba(208,146,95,.55)"], ["Argent","#4f5b66","#dbe4ec","rgba(219,228,236,.5)"],
+  ["Or","#7d5a17","#f6d77a","rgba(246,215,122,.6)"], ["Platine","#1b5f5c","#8ff0e3","rgba(143,240,227,.55)"], ["Émeraude","#0d5c37","#6df0a6","rgba(109,240,166,.55)"],
+  ["Diamant","#2a3f8f","#b5ccff","rgba(181,204,255,.6)"], ["Maître","#4f1c73","#e2a8ff","rgba(226,168,255,.65)"]], DIVS = ["IV","III","II","I"];
+const man = c => String(c).replace(".", "-");
+// Emblème de rang (dessin original) : plus le rang est haut, plus il est orné
+const emblem = (t, sz = 44, cls = "") => { const [, a, b] = TIERS[t], id = "e" + t + Math.random().toString(36).slice(2, 7);
+  return `<svg class="emb ${cls}" width="${sz}" height="${sz}" viewBox="0 0 64 64" style="--glow:${TIERS[t][3]}"><defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${b}"/><stop offset="1" stop-color="${a}"/></linearGradient></defs>
+    ${t >= 3 ? `<path d="M9 20 1 12l3 14M55 20l8-8-3 14" fill="none" stroke="${b}" stroke-width="2.5" stroke-linecap="round"/>` : ""}${t >= 5 ? `<path d="M7 38 0 46l9-2M57 38l7 8-9-2" fill="none" stroke="${b}" stroke-width="2.5" stroke-linecap="round"/>` : ""}
+    ${t >= 6 ? `<path d="M22 7 25 1l7 4 7-4 3 6" fill="${b}" stroke="#05090e" stroke-width="1"/>` : ""}
+    <path d="M32 5 54 18v28L32 59 10 46V18Z" fill="url(#${id})" stroke="#05090e" stroke-width="2"/>
+    <path d="M32 13 47 22v20L32 51 17 42V22Z" fill="#0b141e" stroke="${b}" stroke-width="1.5"/>${t >= 1 ? `<path d="M32 13v-6M32 51v6" stroke="${b}" stroke-width="2"/>` : ""}
+    <path d="m32 21 8 11-8 11-8-11Z" fill="url(#${id})"/><path d="m32 21 3 11-3 11" fill="rgba(255,255,255,.35)"/></svg>`; };
 
 // ===== État =====
 let D = {}, U = {tab:"camp", segQ:"quetes", segS:"kine", vueA:"mois", jq:auj(), jour:auj(), mois:auj().slice(0, 8) + "01", ouvert:null}, W = {}, PT = {x:innerWidth / 2, y:innerHeight / 2};
@@ -363,11 +380,12 @@ const palDe = ph => D.paliers.filter(p => p.phase_id === ph.id);
 const phaseValidee = ph => { const p = palDe(ph); return p.length > 0 && p.every(x => x.statut === "valide"); };
 const critsDe = p => D.criteres.filter(c => c.palier_id === p.id);
 const critOK = c => ["atteint","non_applicable"].includes(c.statut);
-// Conditions de passage : jamais le temps seul, jamais les XP
+// Conditions de passage : jamais le temps seul, jamais les LP
 const blocages = p => [p.statut !== "actif" && "le palier doit être le palier actif (non suspendu)", p.date_min && p.date_min > auj() && `date minimale : ${fmt(p.date_min, LONG)}`,
   ...critsDe(p).filter(c => c.obligatoire && !critOK(c)).map(c => `critère « ${c.nom} » : ${L.crit[c.statut].toLowerCase()}`)].filter(Boolean);
-const niveau = x => { let n = 1, s = 0, b = 100; while (x >= s + b) { s += b; n++; b = 100 + 25 * (n - 1); } return {n, dans:x - s, besoin:b}; };
-const titre = n => TITRES[Math.min(Math.floor(n / 4), TITRES.length - 1)];
+// 7 rangs × 4 divisions puis Maître ; coût d'une division : 250 LP au Fer, +125 LP par rang
+const niveau = x => { let s = 0; for (let t = 0; t < 7; t++) for (let d = 0; d < 4; d++) { const b = 250 + 125 * t; if (x < s + b) return {n:t * 4 + d + 1, t, d, dans:x - s, besoin:b}; s += b; } return {n:29, t:7, d:null, dans:x - s, besoin:null}; };
+const titre = n => n >= 29 ? "Maître" : `${TIERS[Math.floor((n - 1) / 4)][0]} ${DIVS[(n - 1) % 4]}`;
 const soin = id => D.soins.find(s => s.id === id);
 const occ = id => D.soin_occurrences.find(o => o.id === id);
 const occDe = (s, tout) => D.soin_occurrences.filter(o => o.soin_id === s.id && (tout || o.statut !== "annule"));
@@ -396,34 +414,34 @@ const jauge = (k, p, cls = "") => `<div class="jauge ${cls}"><i data-k="${k}" da
 const animerJauges = () => requestAnimationFrame(() => requestAnimationFrame(() => $$("[data-w]").forEach(i => { i.style.width = i.dataset.w + "%"; W[i.dataset.k] = i.dataset.w; })));
 
 // ===== Rendu général =====
-const NAV = [["camp","Hall","M3 20h18M12 4 4 20M12 4l8 16M12 9v11"], ["aventure","Cursus","M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2ZM9 4v14M15 6v14"], ["quetes","Devoirs","M5 21V4h11l-2 4 2 4H5"],
-  ["seances","Cours","M6 7v10M3 9v6M18 7v10M21 9v6M6 12h12"], ["agenda","Agenda","M3 5h18v16H3zM3 10h18M8 3v4M16 3v4"], ["carnet","Grimoire","M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3ZM5 17a3 3 0 0 1 3-3h11"]];
+const NAV = [["camp","Accueil","M3 20h18M12 4 4 20M12 4l8 16M12 9v11"], ["aventure","Étapes","M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2ZM9 4v14M15 6v14"], ["quetes","Défis","M5 21V4h11l-2 4 2 4H5"],
+  ["seances","Entraîn.","M6 7v10M3 9v6M18 7v10M21 9v6M6 12h12"], ["agenda","Agenda","M3 5h18v16H3zM3 10h18M8 3v4M16 3v4"], ["carnet","Profil","M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3ZM5 17a3 3 0 0 1 3-3h11"]];
 $("#nav").innerHTML = NAV.map(([k, t, d]) => `<button data-a="tab" data-id="${k}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="${d}"/></svg>${t}</button>`).join("");
 const rendre = () => {
   document.body.classList.toggle("calme", D.profil.animations === false);
   $$("nav button").forEach(b => b.classList.toggle("on", b.dataset.id === U.tab));
   const j = jPost(), nv = niveau(D.xpTotal);
   $("#barre").classList.toggle("hide", U.tab === "camp");
-  $("#barre").innerHTML = `<span class="marque">REBUILD</span><span>${j >= 0 ? "J+" + j : "J" + j}</span><span>Niv. ${nv.n}</span><button data-a="reglages">${AV()}</button>`;
+  $("#barre").innerHTML = `<span class="marque">REBUILD</span><span>${j >= 0 ? "J+" + j : "J" + j}</span><span>${titre(nv.n)}</span><button data-a="reglages">${AV()}</button>`;
   $("#vue").innerHTML = VUES[U.tab](); animerJauges();
 };
-// Rechargement + détection des récompenses (XP, niveau, badges)
+// Rechargement + détection des récompenses (LP, niveau, badges)
 const maj = async () => {
   const av = {x:D.xpTotal, n:niveau(D.xpTotal).n, b:badgesObtenus().map(b => b[0])};
   await charger(); rendre();
   if (D.xpTotal > av.x) xpPop(D.xpTotal - av.x);
-  const n = niveau(D.xpTotal).n; if (n > av.n) celebrer(`Niveau ${n}`, `Te voilà ${titre(n)} !`, "✦");
+  const r = niveau(D.xpTotal); if (r.n > av.n) celebrer(titre(r.n), r.t > niveau(av.x).t ? "Nouveau rang atteint !" : "Promotion", emblem(r.t, 130));
   badgesObtenus().filter(b => !av.b.includes(b[0])).forEach(b => toast(`${b[1]} Badge obtenu : ${b[0]}`));
 };
-const xpPop = n => { const s = document.createElement("div"); s.className = "xp-pop"; s.textContent = `+${n} XP`; s.style.left = PT.x + "px"; s.style.top = PT.y - 20 + "px"; document.body.append(s); setTimeout(() => s.remove(), 1200); };
-const celebrer = (t, s, ico) => { const f = document.createElement("div"); f.className = "fete"; f.innerHTML = `<div class="fete-in"><div class="sceau-or">${ico}</div><small>${esc(s)}</small><h2>${esc(t)}</h2><button class="prim">Continuer</button></div>`; f.onclick = () => f.remove(); document.body.append(f); };
+const xpPop = n => { const s = document.createElement("div"); s.className = "xp-pop"; s.textContent = `+${n} LP`; s.style.left = PT.x + "px"; s.style.top = PT.y - 20 + "px"; document.body.append(s); setTimeout(() => s.remove(), 1200); };
+const celebrer = (t, s, ico) => { const f = document.createElement("div"); f.className = "fete"; f.innerHTML = `<div class="fete-in"><div class="sceau-or ${String(ico).startsWith("<svg") ? "nu" : ""}">${ico}</div><small>${esc(s)}</small><h2>${esc(t)}</h2><button class="prim">Continuer</button></div>`; f.onclick = () => f.remove(); document.body.append(f); };
 
 // ===== Blocs réutilisables =====
 const alertes = () => {
   const j = jPost(), pt = phaseTemp(j), pc = phaseClin(), pa = palActif(), out = [];
   if (pa && pt.numero > pc.numero) { const n = critsDe(pa).filter(c => c.obligatoire && !critOK(c)).length;
-    out.push(["🧭", `Tu es dans la période indicative de la phase ${pt.numero}. ${n === 0 ? "Les critères du palier " + pa.code + " sont remplis : la validation revient à ton kiné." : n === 1 ? "Ton dernier critère clinique reste à évaluer avant le passage en année supérieure." : `${n} critères cliniques restent à évaluer avant le passage en année supérieure.`} Le programme actuellement autorisé reste actif.`]); }
-  if (pa?.statut === "suspendu") out.push(["⏸️", `Le palier ${pa.code} est suspendu. Prends le temps qu'il faut : ta progression joueur continue.`, "att"]);
+    out.push(["🧭", `Tu es dans la période indicative de la phase ${pt.numero}. ${n === 0 ? "Les critères du palier " + pa.code + " sont remplis : la validation revient à ton kiné." : n === 1 ? "Ton dernier critère clinique reste à évaluer avant de passer à l'étape suivante." : `${n} critères cliniques restent à évaluer avant de passer à l'étape suivante.`} Le programme actuellement autorisé reste actif.`]); }
+  if (pa?.statut === "suspendu") out.push(["⏸️", `Le manche ${man(pa.code)} est suspendu. Prends le temps qu'il faut : ta progression joueur continue.`, "att"]);
   const n = D.soin_occurrences.filter(o => o.statut === "prevu" && o.date_prevue < auj()).length;
   if (n) out.push(["🩹", `${n} soin${n > 1 ? "s" : ""} passé${n > 1 ? "s" : ""} non documenté${n > 1 ? "s" : ""} : indique s'il a été réalisé ou oublié.`, "att"]);
   return out.map(([i, t, c]) => `<div class="alerte ${c || ""}"><span>${i}</span><span>${t}</span></div>`).join("");
@@ -437,7 +455,7 @@ const carteQuete = (q, d) => {
   return `<div class="quete cat-${q.categorie} ${fini ? "finie" : ""} ${x.statut}"><div class="q-ico">${q.icone || "🧭"}</div>
     <div class="q-corps" data-a="qDetail" data-id="${id}"><b>${esc(q.titre)}</b><small>${esc(q.description || L.cat[q.categorie])}</small>
     ${jauge("q" + id, pct(x.valeur, q.cible), fini ? "or" : "")}<small>${nb(x.valeur)} / ${nb(q.cible)} ${esc(q.unite)}${x.statut !== "en_cours" && !fini ? " · " + L.qst[x.statut].toLowerCase() : ""}</small></div>
-    <div class="q-act"><span class="xp-tag">+${q.xp} XP</span><div>${q.cible > 1 && !fini ? `<button class="mini" data-a="qPlus" data-id="${id}">+${pas(q)}</button>` : ""}
+    <div class="q-act"><span class="xp-tag">+${q.xp} LP</span><div>${q.cible > 1 && !fini ? `<button class="mini" data-a="qPlus" data-id="${id}">+${pas(q)}</button>` : ""}
     <button class="valide ${fini ? "on" : ""}" data-a="qFin" data-id="${id}" aria-label="Valider">✓</button></div></div></div>`;
 };
 const carteOcc = o => {
@@ -445,7 +463,7 @@ const carteOcc = o => {
   return `<div class="quete cat-medicale ${f ? "finie" : ""}"><div class="q-ico">${L.soin[s.type][0]}</div>
     <div class="q-corps" data-a="occMenu" data-id="${o.id}"><b>${esc(s.nom)}</b><small>${l.indexOf(o) + 1}e sur ${l.length}${o.heure_prevue ? " · " + hh(o.heure_prevue) : ""}${o.statut === "oublie" ? " · oubli signalé" : ""}</small>
     ${jauge("s" + s.id, pct(r, l.length), r === l.length ? "or" : "")}<small>Progression : ${r} / ${l.length}</small></div>
-    <div class="q-act"><span class="xp-tag">+${pts(s.type === "autre" ? "soin" : s.type)} XP</span><button class="valide ${f ? "on" : ""}" data-a="occToggle" data-id="${o.id}" aria-label="Valider">✓</button></div></div>`;
+    <div class="q-act"><span class="xp-tag">+${pts(s.type === "autre" ? "soin" : s.type)} LP</span><button class="valide ${f ? "on" : ""}" data-a="occToggle" data-id="${o.id}" aria-label="Valider">✓</button></div></div>`;
 };
 const quetesDuJour = d => {
   const e = D.evenements.filter(x => x.date === d && x.statut !== "annule"), o = D.soin_occurrences.filter(x => x.date_prevue === d && x.statut !== "annule"), jn = D.journal.find(x => x.date === d);
@@ -453,7 +471,7 @@ const quetesDuJour = d => {
       <div class="q-act"><button class="valide ${x.statut === "fait" ? "on" : ""}" data-a="evtToggle" data-id="${x.id}">✓</button></div></div>`).join("")
     + o.map(carteOcc).join("") + qActives(d).map(q => carteQuete(q, d)).join("")
     + `<div class="quete cat-suivi ${jn ? "finie" : ""}"><div class="q-ico">📓</div><div class="q-corps" data-a="journal" data-id="${d}"><b>Journal de récupération</b><small>${jn ? `Douleur ${jn.douleur ?? "–"}/10 · confiance ${jn.confiance ?? "–"}/10` : "Douleur, gonflement, fatigue, ressenti"}</small></div>
-      <div class="q-act"><span class="xp-tag">+${pts("journal")} XP</span><button class="valide ${jn ? "on" : ""}" data-a="journal" data-id="${d}">✓</button></div></div>`;
+      <div class="q-act"><span class="xp-tag">+${pts("journal")} LP</span><button class="valide ${jn ? "on" : ""}" data-a="journal" data-id="${d}">✓</button></div></div>`;
 };
 
 // ===== Vues =====
@@ -466,52 +484,52 @@ VUES.camp = () => {
     ...D.soins.flatMap(s => { const o = occDe(s).find(o => o.statut === "prevu" && o.date_prevue > auj()); return o ? [{d:o.date_prevue, h:o.heure_prevue, ic:L.soin[s.type][0], t:s.nom, s:"Prochain soin", a:"occMenu", id:o.id}] : []; })]
     .sort((a, b) => (a.d + (a.h || "")).localeCompare(b.d + (b.h || ""))).slice(0, 4);
   return `<section class="hero"><div class="hero-haut"><span class="marque">REBUILD</span><span class="date">${new Date().toLocaleDateString("fr-FR", LONG)}</span><button data-a="reglages" aria-label="Réglages">${AV()}</button></div>
-    <div class="licence"><div class="lic-g">${AV()}<span class="rang">Niv. ${nv.n}</span></div>
-      <div class="lic-d"><small>Carte d'étudiant · ${titre(nv.n)}</small><b class="nom">${esc(D.profil.prenom || "Étudiant")}</b><span class="lieu">Année ${ROM[pc.numero - 1] || pc.numero} — ${esc(pc.nom)}</span>
+    <div class="licence"><div class="lic-g">${emblem(nv.t, 84)}<span class="rang">${titre(nv.n)}</span></div>
+      <div class="lic-d"><small>Partie classée · saison rééducation</small><b class="nom">${esc(D.profil.prenom || "Invocateur")}</b><span class="lieu">Étape ${pc.numero} — ${esc(pc.nom)}</span>
       <span class="jx">${j >= 0 ? `J+${j} · semaine ${Math.floor(j / 7) + 1} postopératoire · mois ${Math.floor(j / 30.44) + 1}` : `Opération dans ${-j} jour${j < -1 ? "s" : ""}`}</span></div></div>
-    ${jauge("xp", pct(nv.dans, nv.besoin), "or")}<div class="xp"><span>✦ Points de magie ${nb(nv.dans)} / ${nb(nv.besoin)}</span><span>Total ${nb(D.xpTotal)} XP</span></div>
-    <svg class="montagnes" viewBox="0 0 400 110" preserveAspectRatio="none"><path d="M0 110V84l70-16 80 10 90-20 80 14 80-10v48Z" fill="#2c2850" opacity=".7"/><path d="M0 110V92h36V76h10V60l9-16 9 16v16h14V88h28V68h8V50l12-24 12 24v18h8v20h24V60h10V38l14-28 14 28v22h10v28h28V74l10-18 10 18v14h20V82h12V58l11-22 11 22v24h16v12h26V80l8-14 8 14v30Z" fill="#11102a"/><g fill="#e9c56b" opacity=".85"><rect x="187" y="60" width="3" height="6" rx="1.5"/><rect x="146" y="74" width="3" height="5" rx="1.5"/><rect x="287" y="70" width="3" height="5" rx="1.5"/><rect x="58" y="72" width="2.5" height="5" rx="1.2"/></g></svg></section>
+    ${jauge("xp", nv.besoin ? pct(nv.dans, nv.besoin) : 100, "or")}<div class="xp"><span>${nv.besoin ? `${nb(nv.dans)} / ${nb(nv.besoin)} LP · vers ${titre(nv.n + 1)}` : `${nb(nv.dans)} LP au rang Maître`}</span><span>Total ${nb(D.xpTotal)} LP</span></div>
+    <div class="echelle">${TIERS.map((t, i) => `<div class="${i < nv.t ? "fait" : i === nv.t ? "ici" : ""}">${emblem(i, i === nv.t ? 38 : 28)}${t[0]}</div>`).join("")}</div></section>
   ${alertes()}
-  <h2>Mes devoirs du jour <small>${aFaire ? aFaire + " à faire" : "Tous les devoirs sont faits ✦"}</small></h2>${quetesDuJour(auj())}
-  <h2>Mon cursus <button class="lien" data-a="tab" data-id="aventure">Voir le cursus</button></h2>
+  <h2>Défis du jour <small>${aFaire ? aFaire + " à faire" : "Tous les défis sont validés ✦"}</small></h2>${quetesDuJour(auj())}
+  <h2>Mon ascension <button class="lien" data-a="tab" data-id="aventure">Voir les étapes</button></h2>
   <div class="carte carte-map"><div class="parcours"><svg class="chemin" viewBox="0 0 100 98" preserveAspectRatio="none"><path d="M10 51 C20 51 20 23 30 23 S40 51 50 51 S60 23 70 23 S80 51 90 51" fill="none" stroke="#7b6a52" stroke-width="2" stroke-dasharray="5 5" vector-effect="non-scaling-stroke"/></svg>${D.phases.map(ph => { const v = phaseValidee(ph), c = ph.id === pc.id, l = !v && !c && ph.numero > pc.numero;
-    return `<button class="etape ${v ? "v" : c ? "c" : l ? "l" : ""}" data-a="tab" data-id="aventure"><span>${v ? "✦" : l ? "🔒" : ICO_PHASE[ph.numero - 1] || ph.numero}</span><small>${ROM[ph.numero - 1] || ph.numero}</small></button>`; }).join("")}</div><p class="lieu-actuel">Année ${ROM[pc.numero - 1] || pc.numero} — ${esc(pc.nom)}</p></div>
+    return `<button class="etape ${v ? "v" : c ? "c" : l ? "l" : ""}" data-a="tab" data-id="aventure"><span>${v ? "✦" : l ? "🔒" : ICO_PHASE[ph.numero - 1] || ph.numero}</span><small>${ROM[ph.numero - 1] || ph.numero}</small></button>`; }).join("")}</div><p class="lieu-actuel">Étape ${ROM[pc.numero - 1] || pc.numero} — ${esc(pc.nom)}</p></div>
   <h2>Mes progressions</h2><div class="carte">
     <div class="prog-l"><span>⏳</span><div><b>Temps postopératoire</b><small>${lt[0]}</small>${jauge("pt", lt[1], "temps")}</div></div>
-    <div class="prog-l"><span>🩺</span><div><b>Clinique</b><small>${pa ? `Palier ${pa.code} · ${cr.filter(critOK).length} / ${cr.length} critères validés` : "Tous les paliers sont validés"}</small>${jauge("pc", pa ? pct(cr.filter(critOK).length, cr.length) : 100)}</div></div>
-    <div class="prog-l"><span>🏋️</span><div><b>Préparation physique</b><small>${ob.filter(o => o.valide).length} / ${ob.length} objectifs validés · année ${ROM[pc.numero - 1] || pc.numero}</small>${jauge("pp", pct(ob.filter(o => o.valide).length, ob.length))}</div></div>
-    <div class="prog-l"><span>✦</span><div><b>Aventure</b><small>Niveau ${nv.n} · ${nb(nv.dans)} / ${nb(nv.besoin)} XP</small>${jauge("pa", pct(nv.dans, nv.besoin), "or")}</div></div>
+    <div class="prog-l"><span>🩺</span><div><b>Clinique</b><small>${pa ? `Manche ${man(pa.code)} · ${cr.filter(critOK).length} / ${cr.length} critères validés` : "Tous les paliers sont validés"}</small>${jauge("pc", pa ? pct(cr.filter(critOK).length, cr.length) : 100)}</div></div>
+    <div class="prog-l"><span>🏋️</span><div><b>Préparation physique</b><small>${ob.filter(o => o.valide).length} / ${ob.length} objectifs validés · étape ${pc.numero}</small>${jauge("pp", pct(ob.filter(o => o.valide).length, ob.length))}</div></div>
+    <div class="prog-l"><span>🏆</span><div><b>Classement</b><small>${titre(nv.n)} · ${nv.besoin ? `${nb(nv.dans)} / ${nb(nv.besoin)} LP` : `${nb(nv.dans)} LP`}</small>${jauge("pa", nv.besoin ? pct(nv.dans, nv.besoin) : 100, "or")}</div></div>
     <p class="note">La barre de temps indique le temps écoulé dans la période indicative, jamais un pourcentage de guérison.</p></div>
   <h2>Prochains événements <button class="lien" data-a="evtEdit" data-id="new">+ Ajouter</button></h2>
   <div class="carte">${ev.map(ligneEvt).join("") || `<p class="vide">Aucun événement à venir.</p>`}</div>
-  <h2>Distinctions</h2><div class="recomp">
-    <div><small>Dernier badge</small><b>${bo.length ? bo.at(-1)[1] + " " + bo.at(-1)[0] : "—"}</b></div><div><small>Niveau</small><b>${nv.n} · ${titre(nv.n)}</b></div>
-    <div><small>Prochain succès</small><b>${suiv ? suiv[1] + " " + suiv[0] : "Tous obtenus ✦"}</b>${suiv ? `<small>${suiv[2]}</small>` : ""}</div><div><small>Années validées</small><b>${D.phases.filter(phaseValidee).length} / ${D.phases.length}</b></div></div>`;
+  <h2>Récompenses</h2><div class="recomp">
+    <div><small>Dernier badge</small><b>${bo.length ? bo.at(-1)[1] + " " + bo.at(-1)[0] : "—"}</b></div><div><small>Rang actuel</small><b>${titre(nv.n)}</b></div>
+    <div><small>Prochain succès</small><b>${suiv ? suiv[1] + " " + suiv[0] : "Tous obtenus ✦"}</b>${suiv ? `<small>${suiv[2]}</small>` : ""}</div><div><small>Étapes validées</small><b>${D.phases.filter(phaseValidee).length} / ${D.phases.length}</b></div></div>`;
 };
 
 VUES.aventure = () => {
   const pc = phaseClin(), last = {};
   D.mesures.forEach(m => last[m.type] = m);
-  return `<h1 class="page">Mon cursus</h1>${alertes()}<div class="trail" style="margin-top:1rem">${D.phases.map(ph => {
+  return `<h1 class="page">Étapes</h1>${alertes()}<div class="trail" style="margin-top:1rem">${D.phases.map(ph => {
     const v = phaseValidee(ph), c = ph.id === pc.id, l = !v && !c && ph.numero > pc.numero, o = U.ouvert == null ? c : U.ouvert === ph.id;
     return `<article class="chapitre ${v ? "v" : c ? "c" : l ? "l" : ""}"><div class="sceau">${v ? "✦" : l ? "🔒" : ROM[ph.numero - 1] || ph.numero}</div><div class="ch-corps">
-      <div class="ch-tete" data-a="chapitre" data-id="${ph.id}"><small>Année ${ROM[ph.numero - 1] || ph.numero} · J+${ph.debut_jour}${ph.fin_jour != null ? " → J+" + ph.fin_jour : " et après"} (indicatif)</small><h3>${ICO_PHASE[ph.numero - 1] || ""} ${esc(ph.nom)}</h3><p>${esc(ph.objectif)}</p></div>
+      <div class="ch-tete" data-a="chapitre" data-id="${ph.id}"><small>Étape ${ph.numero} · J+${ph.debut_jour}${ph.fin_jour != null ? " → J+" + ph.fin_jour : " et après"} (indicatif)</small><h3>${ICO_PHASE[ph.numero - 1] || ""} ${esc(ph.nom)}</h3><p>${esc(ph.objectif)}</p></div>
       ${o ? `<p class="desc">${esc(ph.description)}</p>${ph.restrictions ? `<div class="restr"><b>Restrictions</b>${esc(ph.restrictions)}</div>` : ""}
-        ${palDe(ph).map(p => { const cr = critsDe(p); return `<button class="palier ${p.statut}" data-a="palier" data-id="${p.id}"><span class="code">${p.code}</span><span>${esc(p.nom)}${p.prolonge ? " · prolongé" : ""}</span><small>${cr.length ? cr.filter(critOK).length + "/" + cr.length + " · " : ""}${L.pal[p.statut]}</small></button>`; }).join("")}
-        <div class="acts" style="margin-top:.6rem"><button class="lien" data-a="phaseEdit" data-id="${ph.id}">✎ Modifier l'année</button></div>`
+        ${palDe(ph).map(p => { const cr = critsDe(p); return `<button class="palier ${p.statut}" data-a="palier" data-id="${p.id}"><span class="code">${man(p.code)}</span><span>${esc(p.nom)}${p.prolonge ? " · prolongé" : ""}</span><small>${cr.length ? cr.filter(critOK).length + "/" + cr.length + " · " : ""}${L.pal[p.statut]}</small></button>`; }).join("")}
+        <div class="acts" style="margin-top:.6rem"><button class="lien" data-a="phaseEdit" data-id="${ph.id}">✎ Modifier l'étape</button></div>`
       : `<div class="mini-pal">${palDe(ph).map(p => `<i class="${p.statut}"></i>`).join("")}</div>`}</div></article>`; }).join("")}</div>
   <h2>Suivi clinique <button class="lien" data-a="mesure" data-id="new">+ Mesure</button></h2>
   <div class="carte"><div class="recap" style="grid-template-columns:repeat(3,1fr);margin-top:0">${["flexion","extension","perimetre"].map(t => `<div><b>${last[t] ? nb(last[t].valeur) + (last[t].unite || "") : "—"}</b><small>${L.mes[t][0]}${last[t] ? " · " + fmt(last[t].date) : ""}</small></div>`).join("")}</div>
     ${D.mesures.slice(-8).reverse().map(m => `<div class="occ" data-a="mesure" data-id="${m.id}" style="cursor:pointer"><span>${esc(L.mes[m.type]?.[0] || m.type)} · <b>${nb(m.valeur)} ${esc(m.unite || "")}</b>${m.methode ? " · " + esc(m.methode) : ""}</span><span class="chip ${m.source === "kine" ? "fait" : ""}">${m.source === "kine" ? "kiné" : "patient"}</span><small>${fmt(m.date)}</small></div>`).join("") || `<p class="vide">Aucune mesure enregistrée.</p>`}</div>`;
 };
 
-VUES.quetes = () => `<h1 class="page">Mes devoirs</h1><div class="seg">${[["quetes","Devoirs"],["soins","Soins"]].map(([v, t]) => `<button class="${U.segQ === v ? "on" : ""}" data-a="seg" data-id="segQ:${v}">${t}</button>`).join("")}</div>${U.segQ === "quetes" ? vueQuetes() : vueSoins()}`;
+VUES.quetes = () => `<h1 class="page">Défis</h1><div class="seg">${[["quetes","Défis"],["soins","Soins"]].map(([v, t]) => `<button class="${U.segQ === v ? "on" : ""}" data-a="seg" data-id="segQ:${v}">${t}</button>`).join("")}</div>${U.segQ === "quetes" ? vueQuetes() : vueSoins()}`;
 const vueQuetes = () => {
   const d = U.jq, g = {actives:[], avenir:[], finies:[]};
   D.quetes.forEach(q => (q.date_debut > auj() ? g.avenir : !q.actif || (q.date_fin && q.date_fin < auj()) ? g.finies : g.actives).push(q));
-  const ligne = q => `<div class="obj"><span data-a="queteEdit" data-id="${q.id}">${q.icone} <b>${esc(q.titre)}</b><small style="display:block">${nb(q.cible)} ${esc(q.unite)} · ${L.cat[q.categorie]} · ${fmt(q.date_debut)}${q.date_fin ? " → " + fmt(q.date_fin) : " → sans fin"}</small></span><span class="xp-tag">+${q.xp} XP</span></div>`;
+  const ligne = q => `<div class="obj"><span data-a="queteEdit" data-id="${q.id}">${q.icone} <b>${esc(q.titre)}</b><small style="display:block">${nb(q.cible)} ${esc(q.unite)} · ${L.cat[q.categorie]} · ${fmt(q.date_debut)}${q.date_fin ? " → " + fmt(q.date_fin) : " → sans fin"}</small></span><span class="xp-tag">+${q.xp} LP</span></div>`;
   return `<div class="nav-jour"><button data-a="jq" data-id="-1">‹</button><b class="serif">${d === auj() ? "Aujourd'hui" : fmt(d, LONG)}</b><button data-a="jq" data-id="1" ${d >= auj() ? "disabled" : ""}>›</button></div>
-    ${quetesDuJour(d)}<h2>Modèles de devoirs <button class="lien" data-a="queteEdit" data-id="new">+ Nouveau devoir</button></h2>
+    ${quetesDuJour(d)}<h2>Modèles de défis <button class="lien" data-a="queteEdit" data-id="new">+ Nouveau défi</button></h2>
     <div class="carte">${g.actives.map(ligne).join("") || `<p class="vide">Aucune quête active.</p>`}
     ${g.avenir.length ? `<h4>À venir</h4>${g.avenir.map(ligne).join("")}` : ""}${g.finies.length ? `<details><summary>Terminées ou désactivées (${g.finies.length})</summary>${g.finies.map(ligne).join("")}</details>` : ""}</div>
     <p class="note">Les objectifs des quêtes sont des exemples de configuration à valider par ton kiné : ils ne constituent pas une prescription.</p>`;
@@ -537,8 +555,8 @@ const vueSoins = () => {
 VUES.seances = () => {
   const k = U.segS, pc = phaseClin(), l = D.seances.filter(s => s.type === k).reverse();
   const caps = [...new Set(D.objectifs_physiques.filter(o => o.phase_id === pc.id).map(o => o.capacite))];
-  return `<h1 class="page">Mes cours</h1><div class="seg">${[["kine","Kinésithérapie"],["physique","Préparation physique"]].map(([v, t]) => `<button class="${k === v ? "on" : ""}" data-a="seg" data-id="segS:${v}">${t}</button>`).join("")}</div>
-  ${k === "physique" ? `<h2>Jauges physiques · année ${ROM[pc.numero - 1] || pc.numero} <button class="lien" data-a="objectif" data-id="new">+ Objectif</button></h2><div class="carte">
+  return `<h1 class="page">Entraînement</h1><div class="seg">${[["kine","Kinésithérapie"],["physique","Préparation physique"]].map(([v, t]) => `<button class="${k === v ? "on" : ""}" data-a="seg" data-id="segS:${v}">${t}</button>`).join("")}</div>
+  ${k === "physique" ? `<h2>Jauges physiques · étape ${pc.numero} <button class="lien" data-a="objectif" data-id="new">+ Objectif</button></h2><div class="carte">
     ${caps.map(c => { const o = D.objectifs_physiques.filter(x => x.phase_id === pc.id && x.capacite === c), v = o.filter(x => x.valide).length;
       return `<div style="margin-bottom:.7rem"><div class="prog" style="margin:0"><b style="font:700 .92rem Manrope">${L.cap[c]}</b><small>Objectifs validés : ${v} / ${o.length}</small></div>${jauge("c" + c, pct(v, o.length), v === o.length ? "or" : "")}
         ${o.map(x => `<div class="obj"><span data-a="objectif" data-id="${x.id}">${esc(x.libelle)}${x.cible ? ` <small>· ${esc(x.cible)}</small>` : ""}${x.valide && x.source === "kine" ? ` <span class="chip fait">kiné</span>` : ""}</span><button class="valide ${x.valide ? "on" : ""}" style="width:28px;height:28px" data-a="objToggle" data-id="${x.id}">✓</button></div>`).join("")}</div>`; }).join("") || `<p class="vide">Aucun objectif physique pour ce chapitre.</p>`}
@@ -555,7 +573,7 @@ const itemsDu = d => [
   ...D.evenements.filter(e => e.date === d).map(e => ({d, h:e.heure, ic:L.evt[e.type][0], t:e.titre, s:[L.evt[e.type][1], e.lieu, e.professionnel].filter(Boolean).join(" · "), etat:e.statut, a:"evtEdit", id:e.id, c:"evt"})),
   ...D.soin_occurrences.filter(o => o.date_prevue === d && o.statut !== "annule").map(o => { const s = soin(o.soin_id); return {d, h:o.heure_prevue, ic:L.soin[s.type][0], t:s.nom, s:L.occ[o.statut], etat:o.statut, a:"occMenu", id:o.id, c:"soin"}; }),
   ...D.seances.filter(x => x.date === d).map(x => ({d, ic:x.type === "kine" ? "🦵" : "🏋️", t:x.type === "kine" ? "Séance kiné" : "Séance physique", s:x.objectifs || "Séance enregistrée", a:"seance", id:x.id, c:"seance"})),
-  ...D.paliers.filter(p => p.date_validation === d).map(p => ({d, ic:"✦", t:`Palier ${p.code} validé`, s:p.nom, a:"palier", id:p.id, c:"palier"}))
+  ...D.paliers.filter(p => p.date_validation === d).map(p => ({d, ic:"✦", t:`Manche ${man(p.code)} validé`, s:p.nom, a:"palier", id:p.id, c:"palier"}))
 ].sort((a, b) => (a.h || "99").localeCompare(b.h || "99"));
 VUES.agenda = () => {
   const m = new Date(U.mois + "T12:00"), d0 = new Date(m), cases = [];
@@ -579,15 +597,15 @@ VUES.carnet = () => {
     ...D.seances.map(x => ({d:x.date, ic:x.type === "kine" ? "🦵" : "🏋️", t:x.type === "kine" ? "Séance kiné" : "Séance de préparation physique", s:x.objectifs})),
     ...D.evenements.filter(e => e.statut === "fait").map(e => ({d:e.date, ic:L.evt[e.type][0], t:e.titre, s:e.compte_rendu})),
     ...D.criteres.filter(c => c.statut === "atteint" && c.date_eval).map(c => ({d:c.date_eval, ic:"✅", t:`Critère atteint : ${c.nom}`, s:c.valeur ? c.valeur + (c.unite || "") : ""})),
-    ...D.paliers.filter(p => p.statut === "valide" && p.date_validation).map(p => ({d:p.date_validation, ic:"✦", t:`Palier ${p.code} validé — ${p.nom}`, s:p.validateur, or:1})),
+    ...D.paliers.filter(p => p.statut === "valide" && p.date_validation).map(p => ({d:p.date_validation, ic:"✦", t:`Manche ${man(p.code)} validé — ${p.nom}`, s:p.validateur, or:1})),
     ...D.journal.map(x => ({d:x.date, ic:"📓", t:"Journal", s:[x.douleur != null && `douleur ${x.douleur}/10`, x.gonflement != null && `gonflement ${x.gonflement}/10`, x.confiance != null && `confiance ${x.confiance}/10`, x.ressenti, x.notes].filter(Boolean).join(" · ")})),
     ...D.mesures.map(m => ({d:m.date, ic:"📐", t:`${L.mes[m.type]?.[0] || m.type} : ${nb(m.valeur)} ${m.unite || ""}`, s:m.methode}))].sort((a, b) => b.d.localeCompare(a.d)).slice(0, 120);
   const jours = [...new Set(t.map(x => x.d))];
-  return `<h1 class="page">Grimoire</h1>
+  return `<h1 class="page">Profil</h1>
   <div class="carte"><div class="ent" style="display:flex;justify-content:space-between;align-items:center"><b class="serif">Journal du jour</b><button class="${jn ? "sec" : "prim"}" data-a="journal" data-id="${auj()}">${jn ? "Modifier" : "Remplir"}</button></div>
     ${jn ? `<div class="indic">${["douleur","gonflement","fatigue","confiance"].map(k => jn[k] != null ? `<span class="chip">${k[0].toUpperCase() + k.slice(1)} ${jn[k]}/10</span>` : "").join("")}</div>${jn.ressenti ? `<p class="note">${esc(jn.ressenti)}</p>` : ""}` : `<p class="note">Douleur, gonflement, fatigue, confiance, difficultés et notes personnelles.</p>`}</div>
-  <div class="stats"><div><b>${nb(D.xpTotal)}</b><small>XP</small></div><div><b>${D.soin_occurrences.filter(o => o.statut === "realise").length}</b><small>Soins</small></div><div><b>${D.seances.length}</b><small>Séances</small></div><div><b>${serie()}</b><small>Jours d'affilée</small></div></div>
-  <h2>Distinctions <small>${badgesObtenus().length} / ${BADGES.length}</small></h2><div class="badges">${BADGES.map(b => `<span class="badge ${b[3]() ? "on" : ""}" title="${esc(b[2])}">${b[1]} ${b[0]}</span>`).join("")}</div>
+  <div class="stats"><div><b>${nb(D.xpTotal)}</b><small>LP</small></div><div><b>${D.soin_occurrences.filter(o => o.statut === "realise").length}</b><small>Soins</small></div><div><b>${D.seances.length}</b><small>Séances</small></div><div><b>${serie()}</b><small>Jours d'affilée</small></div></div>
+  <h2>Succès <small>${badgesObtenus().length} / ${BADGES.length}</small></h2><div class="badges">${BADGES.map(b => `<span class="badge ${b[3]() ? "on" : ""}" title="${esc(b[2])}">${b[1]} ${b[0]}</span>`).join("")}</div>
   <h2>Chronologie <button class="lien" data-a="historique">Historique des décisions</button></h2>
   ${jours.map(d => `<div class="tl-j"><h4>${fmt(d, LONG)} · J+${ecart(D.profil.date_operation, d)}</h4><div class="carte" style="padding:.5rem .9rem">${t.filter(x => x.d === d).map(x => `<div class="tl ${x.or ? "or" : ""}"><span>${x.ic}</span><span><b>${esc(x.t)}</b>${x.s ? `<small style="display:block">${esc(x.s)}</small>` : ""}</span></div>`).join("")}</div></div>`).join("") || `<p class="vide">Ton aventure commence : les événements apparaîtront ici.</p>`}
   <div class="acts"><button class="sec" data-a="exporter">⬇ Exporter mes données</button></div>`;
@@ -637,7 +655,7 @@ const A = {
     await enrQ(q, d, sans_b(r)); },
   queteEdit: async id => { const q = id === "new" ? {icone:"🧭", categorie:"recuperation", cible:1, unite:"fois", xp:pts("quete"), date_debut:auj(), actif:true} : quete(id);
     const r = await formulaire(id === "new" ? "Nouvelle quête" : "Modifier la quête", [{k:"titre", l:"Titre", req:1, plein:1}, {k:"icone", l:"Icône"}, {k:"categorie", l:"Catégorie", t:"select", o:opts(L.cat)},
-      {k:"description", l:"Description", t:"textarea"}, {k:"cible", l:"Objectif", t:"number", req:1}, {k:"unite", l:"Unité", ph:"min, fois, séance…", req:1}, {k:"xp", l:"Récompense XP", t:"number", req:1},
+      {k:"description", l:"Description", t:"textarea"}, {k:"cible", l:"Objectif", t:"number", req:1}, {k:"unite", l:"Unité", ph:"min, fois, séance…", req:1}, {k:"xp", l:"Récompense LP", t:"number", req:1},
       {k:"date_debut", l:"Début", t:"date", req:1}, {k:"date_fin", l:"Fin (vide = sans fin)", t:"date"}, {k:"actif", l:"Quête active", t:"check"}], q, {extras:id === "new" ? [] : SUPPR});
     if (!r) return;
     if (r._b === "suppr") { if (!confirm("Supprimer cette quête et son historique ? Pour l'arrêter en gardant l'historique, décoche « Quête active ».")) return; ok(await sb.from("quetes").delete().eq("id", id)); }
@@ -688,7 +706,7 @@ const A = {
   // ----- Séances et préparation physique -----
   seance: async id => { const nv = id.startsWith("new"), [, t, d, p] = id.split(":"), s = nv ? {type:t, date:d || auj(), intervenant:p || "", palier_id:palActif()?.id} : D.seances.find(x => x.id === id), k = s.type === "kine";
     const r = await formulaire(`${nv ? "Nouvelle séance" : "Séance"} ${k ? "kiné" : "physique"}`, [{k:"date", l:"Date", t:"date", req:1}, {k:"duree", l:"Durée (min)", t:"number"},
-      {k:"intervenant", l:k ? "Kiné" : "Encadrant"}, {k:"palier_id", l:"Palier", t:"select", o:[["","—"], ...D.paliers.map(x => [x.id, `${x.code} · ${x.nom}`])]},
+      {k:"intervenant", l:k ? "Kiné" : "Encadrant"}, {k:"palier_id", l:"Palier", t:"select", o:[["","—"], ...D.paliers.map(x => [x.id, `${man(x.code)} · ${x.nom}`])]},
       {k:"objectifs", l:k ? "Objectifs" : "Type / objectif", t:"textarea"}, {k:"exercices", l:"Exercices, séries, répétitions, charges", t:"textarea", rows:4, ph:"Un exercice par ligne : 3 × 10 · 20 kg"},
       ...(k ? [{k:"mesures", l:"Mesures cliniques", t:"textarea", ph:"Flexion 95°, extension -2°…"}] : [{k:"rpe", l:"RPE (effort perçu)", t:"range"}]),
       {k:"douleur", l:"Douleur", t:"range"}, {k:"gonflement", l:k ? "Gonflement" : "Réaction du genou (gonflement)", t:"range"}, {k:"ressenti", l:"Ressenti"},
@@ -698,7 +716,7 @@ const A = {
     else { const x = {...sans_b(r), type:s.type}; ok(nv ? await sb.from("seances").insert(x) : await sb.from("seances").update(x).eq("id", id)); }
     await maj(); },
   objectif: async id => { const nv = id === "new", o = nv ? {capacite:"force", phase_id:phaseClin().id, source:"patient"} : D.objectifs_physiques.find(x => x.id === id);
-    const r = await formulaire(nv ? "Nouvel objectif physique" : "Objectif physique", [{k:"capacite", l:"Capacité", t:"select", o:opts(L.cap)}, {k:"phase_id", l:"Année", t:"select", o:D.phases.map(p => [p.id, `${p.numero}. ${p.nom}`])},
+    const r = await formulaire(nv ? "Nouvel objectif physique" : "Objectif physique", [{k:"capacite", l:"Capacité", t:"select", o:opts(L.cap)}, {k:"phase_id", l:"Étape", t:"select", o:D.phases.map(p => [p.id, `${p.numero}. ${p.nom}`])},
       {k:"libelle", l:"Objectif", req:1, plein:1}, {k:"cible", l:"Cible", ph:"3 × 12 à 20 kg…"}, {k:"source", l:"Saisie", t:"select", o:opts(L.src)}, {k:"valide", l:"Objectif validé", t:"check"}], o, {extras:nv ? [] : SUPPR});
     if (!r) return;
     if (r._b === "suppr") ok(await sb.from("objectifs_physiques").delete().eq("id", id));
@@ -709,24 +727,24 @@ const A = {
   // ----- Moteur de paliers -----
   palier: id => ouvrirPalier(id),
   phaseEdit: async id => { const p = phase(id);
-    const r = await formulaire(`Année ${ROM[p.numero - 1] || p.numero}`, [{k:"nom", l:"Nom", req:1, plein:1}, {k:"objectif", l:"Objectif", plein:1}, {k:"debut_jour", l:"Début indicatif (J+)", t:"number", req:1}, {k:"fin_jour", l:"Fin indicative (J+, vide = ouverte)", t:"number"},
+    const r = await formulaire(`Étape ${p.numero}`, [{k:"nom", l:"Nom", req:1, plein:1}, {k:"objectif", l:"Objectif", plein:1}, {k:"debut_jour", l:"Début indicatif (J+)", t:"number", req:1}, {k:"fin_jour", l:"Fin indicative (J+, vide = ouverte)", t:"number"},
       {k:"description", l:"Objectifs cliniques", t:"textarea", rows:3}, {k:"restrictions", l:"Restrictions", t:"textarea", rows:3}], p);
     if (!r) return; ok(await sb.from("phases").update(sans_b(r)).eq("id", id)); await maj(); },
   palierEdit: async id => { const p = D.paliers.find(x => x.id === id);
-    const r = await formulaire(`Palier ${p.code}`, [{k:"nom", l:"Nom", req:1, plein:1}, {k:"objectifs", l:"Objectifs", t:"textarea"}, {k:"date_min", l:"Date minimale éventuelle", t:"date"}, {k:"prolonge", l:"Palier prolongé par le kiné", t:"check"},
+    const r = await formulaire(`Manche ${man(p.code)}`, [{k:"nom", l:"Nom", req:1, plein:1}, {k:"objectifs", l:"Objectifs", t:"textarea"}, {k:"date_min", l:"Date minimale éventuelle", t:"date"}, {k:"prolonge", l:"Palier prolongé par le kiné", t:"check"},
       {k:"motif", l:"Motif / décision du kiné", t:"textarea"}], {...p, motif:""});
     if (!r) return; ok(await sb.from("paliers").update(sans_b(r)).eq("id", id)); await maj(); ouvrirPalier(id); },
   palierSuspendre: async id => { const p = D.paliers.find(x => x.id === id), s = p.statut === "suspendu";
     const motif = prompt(s ? "Reprise de la progression — commentaire :" : "Motif de la suspension (décision du kiné) :", ""); if (motif === null) return;
     ok(await sb.from("paliers").update({statut:s ? "actif" : "suspendu", motif}).eq("id", id)); await maj(); ouvrirPalier(id); },
   palierValider: async id => { const p = D.paliers.find(x => x.id === id), ph = phase(p.phase_id);
-    const r = await formulaire(`Valider le palier ${p.code}`, [{k:"validateur", l:"Professionnel validateur", req:1, plein:1}, {k:"date_validation", l:"Date de validation", t:"date", req:1},
+    const r = await formulaire(`Valider le manche ${man(p.code)}`, [{k:"validateur", l:"Professionnel validateur", req:1, plein:1}, {k:"date_validation", l:"Date de validation", t:"date", req:1},
       {k:"motif", l:"Commentaire du professionnel", t:"textarea"}, {k:"confirme", l:"Cette validation a été donnée par le professionnel compétent lors d'une évaluation.", t:"check"}], {date_validation:auj()});
     if (!r) return; if (!r.confirme) return toast("La validation d'un palier doit venir du professionnel.", true);
     ok(await sb.from("paliers").update({statut:"valide", validateur:r.validateur, date_validation:r.date_validation, motif:r.motif || "Palier validé"}).eq("id", id));
     await maj(); const nx = palActif();
-    if (nx && nx.phase_id !== ph.id) { const n = phase(nx.phase_id); U.ouvert = null; celebrer(`Année ${ROM[n.numero - 1]} : ${n.nom}`, `Passage en année supérieure !`, ICO_PHASE[n.numero - 1] || "✦"); }
-    else celebrer(`Examen ${p.code} réussi`, `${p.nom} · palier validé`, "✦"); },
+    if (nx && nx.phase_id !== ph.id) { const n = phase(nx.phase_id); U.ouvert = null; celebrer(`Étape ${n.numero} : ${n.nom}`, `Nouvelle étape débloquée !`, ICO_PHASE[n.numero - 1] || "✦"); }
+    else celebrer(`Manche ${man(p.code)} gagnée`, `${p.nom} · palier validé`, "✦"); },
   critere: async id => { const nv = id.startsWith("new"), c = nv ? {palier_id:id.split(":")[1], obligatoire:true, statut:"non_evalue", source:"kine"} : D.criteres.find(x => x.id === id);
     const r = await formulaire(nv ? "Nouveau critère" : "Critère clinique", [{k:"nom", l:"Critère", req:1, plein:1}, {k:"methode", l:"Méthode d'évaluation", plein:1}, {k:"cible", l:"Valeur cible"}, {k:"unite", l:"Unité"},
       {k:"statut", l:"Statut", t:"select", o:opts(L.crit)}, {k:"valeur", l:"Valeur mesurée"}, {k:"date_eval", l:"Date d'évaluation", t:"date"}, {k:"auteur", l:"Évalué par"},
@@ -752,19 +770,19 @@ const A = {
   reglages: async () => { const p = D.profil;
     const r = await formulaire(`${AV()} Réglages`, [{k:"prenom", l:"Prénom"}, {k:"date_operation", l:"Date de l'opération", t:"date", req:1}, {k:"sport", l:"Sport"}, {k:"genou", l:"Genou opéré", t:"select", o:[["","—"],["droit","Droit"],["gauche","Gauche"]]},
       {k:"greffe", l:"Type de greffe", plein:1, ph:"DIDT, tendon rotulien…"}, {k:"animations", l:"Animations activées", t:"check"}], p,
-      {extras:[["bareme","Barème XP"], ["export","Exporter"], ["logout","Déconnexion","danger"]]});
+      {extras:[["bareme","Barème LP"], ["export","Exporter"], ["logout","Déconnexion","danger"]]});
     if (!r) return;
     if (r._b === "logout") return sb.auth.signOut();
     if (r._b === "export") return A.exporter();
     if (r._b === "bareme") return A.bareme();
     ok(await sb.from("profils").update(sans_b(r)).eq("user_id", p.user_id)); await maj(); },
-  bareme: async () => { const r = await formulaire("Barème XP", D.bareme.map(b => ({k:b.source, l:b.libelle || b.source, t:"number", req:1})), Object.fromEntries(D.bareme.map(b => [b.source, b.points])),
-      {intro:`<p class="note" style="margin:-.3rem 0 .8rem">Les XP récompensent la documentation et la régularité. Ils ne débloquent jamais une étape médicale. Le nouveau barème s'applique aux prochaines actions.</p>`});
+  bareme: async () => { const r = await formulaire("Barème LP", D.bareme.map(b => ({k:b.source, l:b.libelle || b.source, t:"number", req:1})), Object.fromEntries(D.bareme.map(b => [b.source, b.points])),
+      {intro:`<p class="note" style="margin:-.3rem 0 .8rem">Les LP récompensent la documentation et la régularité. Ils ne débloquent jamais une étape médicale. Le nouveau barème s'applique aux prochaines actions.</p>`});
     if (!r) return; ok(await sb.from("bareme").upsert(D.bareme.map(b => ({source:b.source, libelle:b.libelle, points:Math.round(r[b.source])})), {onConflict:"user_id,source"})); await maj(); },
   historique: async () => { const h = ok(await sb.from("historique").select("*").order("id", {ascending:false}).limit(80)), d = $("#dlg");
     d.onclose = null;
     d.innerHTML = `<div class="dlg-in"><h3>Historique des décisions</h3><p class="note">Toutes les modifications de chapitres, paliers, critères, prescriptions, objectifs et quêtes sont conservées.</p>
-      ${h.map(x => { const n = x.apres || x.avant || {}; return `<div class="occ"><span><b>${L.tab[x.table_nom] || x.table_nom}</b> · ${L.act[x.action] || x.action} · ${esc(n.code ? n.code + " " : "")}${esc(n.nom || n.titre || n.libelle || "")}${x.motif ? `<small style="display:block">${esc(x.motif)}</small>` : ""}</span><small>${new Date(x.created_at).toLocaleString("fr-FR", {dateStyle:"short", timeStyle:"short"})}</small></div>`; }).join("") || `<p class="vide">Aucune modification.</p>`}
+      ${h.map(x => { const n = x.apres || x.avant || {}; return `<div class="occ"><span><b>${L.tab[x.table_nom] || x.table_nom}</b> · ${L.act[x.action] || x.action} · ${esc(n.code ? man(n.code) + " " : "")}${esc(n.nom || n.titre || n.libelle || "")}${x.motif ? `<small style="display:block">${esc(x.motif)}</small>` : ""}</span><small>${new Date(x.created_at).toLocaleString("fr-FR", {dateStyle:"short", timeStyle:"short"})}</small></div>`; }).join("") || `<p class="vide">Aucune modification.</p>`}
       <div class="acts"><span class="sp"></span><button class="prim" data-a="fermer">Fermer</button></div></div>`;
     d.showModal(); },
   exporter: async () => { const h = ok(await sb.from("historique").select("*").order("id")), x = ok(await sb.from("xp").select("*").order("id"));
@@ -775,7 +793,7 @@ document.addEventListener("click", async e => { const t = e.target.closest("[dat
   if (t.closest("dialog") && !["fermer"].includes(t.dataset.a)) $("#dlg").close();
   try { await A[t.dataset.a](t.dataset.id, t); } catch (err) { console.error(err); } });
 
-// Enregistrement d'une quête pour un jour donné (XP attribués côté base, une seule fois)
+// Enregistrement d'une quête pour un jour donné (LP attribués côté base, une seule fois)
 const enrQ = async (q, d, champs) => { ok(await sb.from("quete_jours").upsert({quete_id:q.id, date:d, ...champs}, {onConflict:"quete_id,date"})); await maj(); };
 
 // Recalcul d'un programme de soins sans perdre l'historique
@@ -793,14 +811,14 @@ const regenerer = async s => {
 const ouvrirPalier = id => {
   const p = D.paliers.find(x => x.id === id), cr = critsDe(p), bl = blocages(p), d = $("#dlg"), ph = phase(p.phase_id);
   d.onclose = null;
-  d.innerHTML = `<div class="dlg-in"><small>Année ${ROM[ph.numero - 1] || ph.numero} · palier ${p.code} · ${L.pal[p.statut]}${p.prolonge ? " · prolongé" : ""}</small><h3>${esc(p.nom)}</h3>
+  d.innerHTML = `<div class="dlg-in"><small>Étape ${ph.numero} · manche ${man(p.code)} · ${L.pal[p.statut]}${p.prolonge ? " · prolongé" : ""}</small><h3>${esc(p.nom)}</h3>
     ${p.objectifs ? `<p style="font-size:.9rem">${esc(p.objectifs)}</p>` : ""}${p.date_min ? `<p class="note">Date minimale : ${fmt(p.date_min, LONG)}</p>` : ""}
-    ${p.statut === "valide" ? `<p class="ok"><span class="tampon">Admis</span> le ${fmt(p.date_validation, LONG)} par ${esc(p.validateur)}</p>` : ""}${p.motif ? `<p class="note">${esc(p.motif)}</p>` : ""}
+    ${p.statut === "valide" ? `<p class="ok"><span class="tampon">Gagnée</span> le ${fmt(p.date_validation, LONG)} par ${esc(p.validateur)}</p>` : ""}${p.motif ? `<p class="note">${esc(p.motif)}</p>` : ""}
     <h4>Critères cliniques ${cr.length ? `· ${cr.filter(critOK).length} / ${cr.length}` : ""}</h4>
     ${cr.map(c => `<button class="crit ${c.statut}" data-a="critere" data-id="${c.id}"><span class="pastille"></span><span><b>${esc(c.nom)}</b><small>${[c.methode, c.cible && `cible ${c.cible}${c.unite || ""}`, c.valeur && `mesuré ${c.valeur}${c.unite || ""}`, c.date_eval && fmt(c.date_eval), !c.obligatoire && "facultatif"].filter(Boolean).map(esc).join(" · ")}</small></span>
       <em>${L.crit[c.statut]}${c.statut !== "non_evalue" ? (c.source === "kine" ? " · kiné" : " · patient") : ""}</em></button>`).join("") || `<p class="vide">Aucun critère : ton kiné définit les critères de ce palier.</p>`}
     <button class="lien" style="margin-top:.6rem" data-a="critere" data-id="new:${p.id}">+ Ajouter un critère</button>
-    ${["actif","suspendu"].includes(p.statut) ? `<div class="bloc-valid">${bl.length ? `<b>Conditions de passage restantes</b><ul>${bl.map(b => `<li>${esc(b)}</li>`).join("")}</ul>` : `<b>Toutes les conditions sont réunies.</b> La validation revient au professionnel.`}<p class="note">Ni le temps écoulé ni les XP ne débloquent un palier.</p></div>` : ""}
+    ${["actif","suspendu"].includes(p.statut) ? `<div class="bloc-valid">${bl.length ? `<b>Conditions de passage restantes</b><ul>${bl.map(b => `<li>${esc(b)}</li>`).join("")}</ul>` : `<b>Toutes les conditions sont réunies.</b> La validation revient au professionnel.`}<p class="note">Ni le temps écoulé ni les LP ne débloquent un palier.</p></div>` : ""}
     <div class="acts"><button class="sec" data-a="palierEdit" data-id="${p.id}">✎ Modifier</button>${p.statut === "actif" ? `<button class="sec" data-a="palierSuspendre" data-id="${p.id}">Suspendre</button>` : p.statut === "suspendu" ? `<button class="sec" data-a="palierSuspendre" data-id="${p.id}">Reprendre</button>` : ""}
       <span class="sp"></span><button data-a="fermer">Fermer</button>${p.statut === "actif" ? `<button class="prim" data-a="palierValider" data-id="${p.id}"${bl.length ? " disabled" : ""}>Valider</button>` : ""}</div></div>`;
   d.showModal();
