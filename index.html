@@ -261,6 +261,39 @@ nav button.on:before{content:"";position:absolute;top:-.45rem;left:25%;right:25%
 @keyframes fondu{from{opacity:0}}
 .toast{position:fixed;left:50%;bottom:calc(5.8rem + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:60;background:#0b141e;color:var(--or2);border:1px solid var(--or);padding:.65rem 1rem;font-size:.88rem;font-weight:700;max-width:90vw;animation:fondu .3s;box-shadow:0 0 18px rgba(200,164,90,.3)}
 .toast.err{border-color:var(--rouge);color:#ffd5db}
+/* Manche en cours, plateau des étapes, puces de sélection */
+.focus{border-color:var(--teal);box-shadow:inset 0 0 26px rgba(31,200,184,.12),inset 0 1px 0 rgba(200,164,90,.35)}
+.focus>small{color:var(--teal);font-weight:800;text-transform:uppercase;letter-spacing:.1em;font-size:.68rem}
+.f-tete{display:flex;gap:.85rem;align-items:center;margin:.55rem 0 .3rem}
+.f-tete div{flex:1;min-width:0}.f-tete h3{font-size:1.25rem;line-height:1.15;color:var(--or2)}.f-tete p{font-size:.84rem;color:var(--gris)}
+.hex{display:grid;place-items:center;width:44px;height:48px;flex:none;clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);background:#0b141e;box-shadow:inset 0 0 0 2px var(--ligne);font:400 .9rem "Marcellus SC",serif;color:var(--or2)}
+.hex.grand{width:62px;height:68px;font-size:1.2rem;background:linear-gradient(180deg,#1d4a50,#0d2a2e);box-shadow:inset 0 0 0 2px var(--teal),inset 0 0 16px rgba(31,200,184,.6);color:#d6fffa}
+.coche-crit{width:30px;height:33px;flex:none;clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);background:#1d2b3a;box-shadow:inset 0 0 0 2px var(--ligne);color:transparent;font-weight:900;transition:all .2s}
+.coche-crit.on{background:linear-gradient(180deg,var(--teal),var(--teal2));color:#04201d}
+.crit>span[data-a]{flex:1;cursor:pointer}
+.etape-bloc.c{border-color:var(--teal)}.etape-bloc.l{opacity:.6}
+.eb-tete{display:flex;gap:.8rem;align-items:center;cursor:pointer}
+.eb-tete>div:not(.sceau){flex:1;min-width:0}.eb-tete small{color:var(--teal);font-weight:800;text-transform:uppercase;letter-spacing:.08em;font-size:.64rem}
+.eb-tete h3{font-size:1.1rem;color:var(--or2)}.eb-tete p{font-size:.8rem;color:var(--gris)}
+.eb-score{font:400 1.15rem "Marcellus SC",serif;color:var(--or2);white-space:nowrap}
+.etape-bloc .sceau{width:42px;height:46px;font-size:1rem}
+.etape-bloc.c .sceau{background:linear-gradient(180deg,#1d4a50,#0d2a2e);color:var(--teal);box-shadow:inset 0 0 0 2px var(--teal)}
+.etape-bloc.v .sceau{background:linear-gradient(180deg,var(--or2),#8c6c2c);color:#1b1408;box-shadow:none}
+.tuiles{display:grid;grid-template-columns:repeat(4,1fr);gap:.4rem;margin-top:.8rem}
+.tuile{display:flex;flex-direction:column;align-items:center;gap:.25rem;text-align:center;padding:.1rem 0}
+.tuile .hex{width:52px;height:58px;font-size:.95rem}
+.tuile small{font-size:.7rem;line-height:1.15;color:var(--texte)}.tuile i{font-style:normal;font-size:.64rem;color:var(--gris)}
+.tuile.valide .hex{background:linear-gradient(180deg,var(--or2),#8c6c2c);color:#1b1408;box-shadow:none;font-size:1.2rem}
+.tuile.actif .hex{background:linear-gradient(180deg,#1d4a50,#0d2a2e);box-shadow:inset 0 0 0 2px var(--teal),inset 0 0 14px rgba(31,200,184,.6);color:#d6fffa}
+.tuile.suspendu .hex{box-shadow:inset 0 0 0 2px var(--orange);color:var(--orange)}
+.tuile.verrouille small{color:var(--gris)}
+label.puce{display:inline-block;margin:0;text-transform:none;letter-spacing:0}
+.puces{display:flex;flex-wrap:wrap;gap:.35rem}
+.puce input{display:none}
+.puce span{display:inline-block;padding:.32rem .6rem;border:1px solid var(--ligne);background:#0b141e;font-size:.8rem;font-weight:700;color:var(--gris);cursor:pointer}
+.puce input:checked+span{border-color:var(--teal);color:#d6fffa;background:rgba(31,200,184,.15);box-shadow:0 0 8px rgba(31,200,184,.3)}
+.bilan-p{border-top:1px solid #1f2f40;padding-top:.7rem;margin-top:.7rem}
+.bilan-p .f-tete{margin:0 0 .2rem}
 .calme *,.calme *:before,.calme *:after{animation:none!important;transition:none!important}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 @media (min-width:700px){.hero{margin:0;border:1px solid var(--or);border-top:0}}
@@ -381,7 +414,7 @@ const phaseValidee = ph => { const p = palDe(ph); return p.length > 0 && p.every
 const critsDe = p => D.criteres.filter(c => c.palier_id === p.id);
 const critOK = c => ["atteint","non_applicable"].includes(c.statut);
 // Conditions de passage : jamais le temps seul, jamais les LP
-const blocages = p => [p.statut !== "actif" && "le palier doit être le palier actif (non suspendu)", p.date_min && p.date_min > auj() && `date minimale : ${fmt(p.date_min, LONG)}`,
+const blocages = p => [p.date_min && p.date_min > auj() && `date minimale : ${fmt(p.date_min, LONG)}`,
   ...critsDe(p).filter(c => c.obligatoire && !critOK(c)).map(c => `critère « ${c.nom} » : ${L.crit[c.statut].toLowerCase()}`)].filter(Boolean);
 // 7 rangs × 4 divisions puis Maître ; coût d'une division : 250 LP au Fer, +125 LP par rang
 const niveau = x => { let s = 0; for (let t = 0; t < 7; t++) for (let d = 0; d < 4; d++) { const b = 250 + 125 * t; if (x < s + b) return {n:t * 4 + d + 1, t, d, dans:x - s, besoin:b}; s += b; } return {n:29, t:7, d:null, dans:x - s, besoin:null}; };
@@ -434,13 +467,13 @@ const maj = async () => {
   badgesObtenus().filter(b => !av.b.includes(b[0])).forEach(b => toast(`${b[1]} Badge obtenu : ${b[0]}`));
 };
 const xpPop = n => { const s = document.createElement("div"); s.className = "xp-pop"; s.textContent = `+${n} LP`; s.style.left = PT.x + "px"; s.style.top = PT.y - 20 + "px"; document.body.append(s); setTimeout(() => s.remove(), 1200); };
-const celebrer = (t, s, ico) => { const f = document.createElement("div"); f.className = "fete"; f.innerHTML = `<div class="fete-in"><div class="sceau-or ${String(ico).startsWith("<svg") ? "nu" : ""}">${ico}</div><small>${esc(s)}</small><h2>${esc(t)}</h2><button class="prim">Continuer</button></div>`; f.onclick = () => f.remove(); document.body.append(f); };
+const celebrer = (t, s, ico, apres) => { const f = document.createElement("div"); f.className = "fete"; f.innerHTML = `<div class="fete-in"><div class="sceau-or ${String(ico).startsWith("<svg") ? "nu" : ""}">${ico}</div><small>${esc(s)}</small><h2>${esc(t)}</h2><button class="prim">Continuer</button></div>`; f.onclick = () => { f.remove(); apres?.(); }; document.body.append(f); };
 
 // ===== Blocs réutilisables =====
 const alertes = () => {
   const j = jPost(), pt = phaseTemp(j), pc = phaseClin(), pa = palActif(), out = [];
   if (pa && pt.numero > pc.numero) { const n = critsDe(pa).filter(c => c.obligatoire && !critOK(c)).length;
-    out.push(["🧭", `Tu es dans la période indicative de la phase ${pt.numero}. ${n === 0 ? "Les critères du palier " + pa.code + " sont remplis : la validation revient à ton kiné." : n === 1 ? "Ton dernier critère clinique reste à évaluer avant de passer à l'étape suivante." : `${n} critères cliniques restent à évaluer avant de passer à l'étape suivante.`} Le programme actuellement autorisé reste actif.`]); }
+    out.push(["🧭", `Tu es dans la période indicative de la phase ${pt.numero}. ${n === 0 ? `Les critères de la manche ${man(pa.code)} sont remplis : tu peux la valider.` : n === 1 ? "Ton dernier critère clinique reste à évaluer avant de passer à l'étape suivante." : `${n} critères cliniques restent à évaluer avant de passer à l'étape suivante.`} Le programme actuellement autorisé reste actif.`]); }
   if (pa?.statut === "suspendu") out.push(["⏸️", `Le manche ${man(pa.code)} est suspendu. Prends le temps qu'il faut : ta progression joueur continue.`, "att"]);
   const n = D.soin_occurrences.filter(o => o.statut === "prevu" && o.date_prevue < auj()).length;
   if (n) out.push(["🩹", `${n} soin${n > 1 ? "s" : ""} passé${n > 1 ? "s" : ""} non documenté${n > 1 ? "s" : ""} : indique s'il a été réalisé ou oublié.`, "att"]);
@@ -473,6 +506,19 @@ const quetesDuJour = d => {
     + `<div class="quete cat-suivi ${jn ? "finie" : ""}"><div class="q-ico">📓</div><div class="q-corps" data-a="journal" data-id="${d}"><b>Journal de récupération</b><small>${jn ? `Douleur ${jn.douleur ?? "–"}/10 · confiance ${jn.confiance ?? "–"}/10` : "Douleur, gonflement, fatigue, ressenti"}</small></div>
       <div class="q-act"><span class="xp-tag">+${pts("journal")} LP</span><button class="valide ${jn ? "on" : ""}" data-a="journal" data-id="${d}">✓</button></div></div>`;
 };
+
+// ----- Critère cochable d'un geste (la ligne ouvre le détail) -----
+const ligneCrit = c => `<div class="crit ${c.statut}"><button class="coche-crit ${critOK(c) ? "on" : ""}" data-a="critToggle" data-id="${c.id}" aria-label="Atteint">✓</button>
+  <span data-a="critere" data-id="${c.id}"><b>${esc(c.nom)}</b><small>${[c.methode, c.cible && `cible ${c.cible}${c.unite || ""}`, c.valeur && `mesuré ${c.valeur}${c.unite || ""}`, c.date_eval && fmt(c.date_eval), !c.obligatoire && "facultatif"].filter(Boolean).map(esc).join(" · ")}</small></span>
+  <em>${L.crit[c.statut]}</em></div>`;
+// ----- Carte de la manche en cours -----
+const carteFocus = pa => { if (!pa) return `<div class="carte focus"><div class="f-tete"><span class="hex grand">✦</span><div><h3>Toutes les manches sont gagnées</h3><p>Le parcours est complet.</p></div></div></div>`;
+  const ph = phase(pa.phase_id), cr = critsDe(pa), n = cr.filter(critOK).length;
+  return `<div class="carte focus"><small>Manche en cours · étape ${ph.numero} — ${esc(ph.nom)}${pa.statut === "suspendu" ? " · suspendue" : ""}</small>
+    <div class="f-tete"><span class="hex grand">${man(pa.code)}</span><div><h3>${esc(pa.nom)}</h3>${pa.objectifs ? `<p>${esc(pa.objectifs)}</p>` : ""}</div></div>
+    ${jauge("focus" + pa.id, pct(n, cr.length))}<small>${n} / ${cr.length} critères atteints${pa.date_min ? " · date minimale " + fmt(pa.date_min) : ""}</small>
+    ${cr.map(ligneCrit).join("") || `<p class="vide">Aucun critère : ajoute ceux que te donne ton kiné.</p>`}
+    <div class="acts"><button class="sec" data-a="critere" data-id="new:${pa.id}">+ Critère</button><button class="sec" data-a="palier" data-id="${pa.id}">Détails</button><span class="sp"></span><button class="prim" data-a="palierValider" data-id="${pa.id}">Valider la manche</button></div></div>`; };
 
 // ===== Vues =====
 const VUES = {};
@@ -508,16 +554,17 @@ VUES.camp = () => {
 };
 
 VUES.aventure = () => {
-  const pc = phaseClin(), last = {};
+  const pc = phaseClin(), pa = palActif(), last = {}, nv = D.paliers.filter(p => p.statut === "valide").length;
   D.mesures.forEach(m => last[m.type] = m);
-  return `<h1 class="page">Étapes</h1>${alertes()}<div class="trail" style="margin-top:1rem">${D.phases.map(ph => {
-    const v = phaseValidee(ph), c = ph.id === pc.id, l = !v && !c && ph.numero > pc.numero, o = U.ouvert == null ? c : U.ouvert === ph.id;
-    return `<article class="chapitre ${v ? "v" : c ? "c" : l ? "l" : ""}"><div class="sceau">${v ? "✦" : l ? "🔒" : ROM[ph.numero - 1] || ph.numero}</div><div class="ch-corps">
-      <div class="ch-tete" data-a="chapitre" data-id="${ph.id}"><small>Étape ${ph.numero} · J+${ph.debut_jour}${ph.fin_jour != null ? " → J+" + ph.fin_jour : " et après"} (indicatif)</small><h3>${ICO_PHASE[ph.numero - 1] || ""} ${esc(ph.nom)}</h3><p>${esc(ph.objectif)}</p></div>
-      ${o ? `<p class="desc">${esc(ph.description)}</p>${ph.restrictions ? `<div class="restr"><b>Restrictions</b>${esc(ph.restrictions)}</div>` : ""}
-        ${palDe(ph).map(p => { const cr = critsDe(p); return `<button class="palier ${p.statut}" data-a="palier" data-id="${p.id}"><span class="code">${man(p.code)}</span><span>${esc(p.nom)}${p.prolonge ? " · prolongé" : ""}</span><small>${cr.length ? cr.filter(critOK).length + "/" + cr.length + " · " : ""}${L.pal[p.statut]}</small></button>`; }).join("")}
-        <div class="acts" style="margin-top:.6rem"><button class="lien" data-a="phaseEdit" data-id="${ph.id}">✎ Modifier l'étape</button></div>`
-      : `<div class="mini-pal">${palDe(ph).map(p => `<i class="${p.statut}"></i>`).join("")}</div>`}</div></article>`; }).join("")}</div>
+  return `<h1 class="page">Étapes</h1>${alertes()}<div style="margin-top:.9rem">${carteFocus(pa)}</div>
+  <h2>Plateau de progression <small>${nv} / ${D.paliers.length} manches gagnées</small></h2>
+  ${D.phases.map(ph => { const ps = palDe(ph), v = phaseValidee(ph), c = ph.id === pc.id, l = !v && !c && ph.numero > pc.numero, o = U.ouvert === ph.id;
+    return `<div class="carte etape-bloc ${v ? "v" : c ? "c" : l ? "l" : ""}"><div class="eb-tete" data-a="chapitre" data-id="${ph.id}"><div class="sceau">${v ? "✦" : ph.numero}</div>
+      <div><small>Étape ${ph.numero} · J+${ph.debut_jour}${ph.fin_jour != null ? " → J+" + ph.fin_jour : " et après"} (indicatif)</small><h3>${ICO_PHASE[ph.numero - 1] || ""} ${esc(ph.nom)}</h3><p>${esc(ph.objectif)}</p></div>
+      <b class="eb-score">${ps.filter(p => p.statut === "valide").length}/${ps.length}</b></div>
+      <div class="tuiles">${ps.map(p => { const cr = critsDe(p); return `<button class="tuile ${p.statut}" data-a="palier" data-id="${p.id}"><span class="hex">${p.statut === "valide" ? "✓" : man(p.code)}</span><small>${esc(p.nom)}</small>${cr.length ? `<i>${cr.filter(critOK).length}/${cr.length} critères</i>` : ""}</button>`; }).join("")}</div>
+      ${o ? `<p class="desc">${esc(ph.description)}</p>${ph.restrictions ? `<div class="restr"><b>Restrictions</b>${esc(ph.restrictions)}</div>` : ""}<div class="acts" style="margin-top:.4rem"><button class="lien" data-a="phaseEdit" data-id="${ph.id}">✎ Modifier l'étape</button></div>`
+        : `<button class="lien" style="margin-top:.5rem;font-size:.78rem" data-a="chapitre" data-id="${ph.id}">Objectifs et restrictions ▾</button>`}</div>`; }).join("")}
   <h2>Suivi clinique <button class="lien" data-a="mesure" data-id="new">+ Mesure</button></h2>
   <div class="carte"><div class="recap" style="grid-template-columns:repeat(3,1fr);margin-top:0">${["flexion","extension","perimetre"].map(t => `<div><b>${last[t] ? nb(last[t].valeur) + (last[t].unite || "") : "—"}</b><small>${L.mes[t][0]}${last[t] ? " · " + fmt(last[t].date) : ""}</small></div>`).join("")}</div>
     ${D.mesures.slice(-8).reverse().map(m => `<div class="occ" data-a="mesure" data-id="${m.id}" style="cursor:pointer"><span>${esc(L.mes[m.type]?.[0] || m.type)} · <b>${nb(m.valeur)} ${esc(m.unite || "")}</b>${m.methode ? " · " + esc(m.methode) : ""}</span><span class="chip ${m.source === "kine" ? "fait" : ""}">${m.source === "kine" ? "kiné" : "patient"}</span><small>${fmt(m.date)}</small></div>`).join("") || `<p class="vide">Aucune mesure enregistrée.</p>`}</div>`;
@@ -562,9 +609,9 @@ VUES.seances = () => {
         ${o.map(x => `<div class="obj"><span data-a="objectif" data-id="${x.id}">${esc(x.libelle)}${x.cible ? ` <small>· ${esc(x.cible)}</small>` : ""}${x.valide && x.source === "kine" ? ` <span class="chip fait">kiné</span>` : ""}</span><button class="valide ${x.valide ? "on" : ""}" style="width:28px;height:28px" data-a="objToggle" data-id="${x.id}">✓</button></div>`).join("")}</div>`; }).join("") || `<p class="vide">Aucun objectif physique pour ce chapitre.</p>`}
     <p class="note">Chaque jauge reflète le nombre d'objectifs validés, pas une estimation universelle de ta condition.</p></div>` : ""}
   <h2>Séances enregistrées <small>${l.length}</small></h2><button class="prim" style="width:100%;margin-bottom:.8rem" data-a="seance" data-id="new:${k}">+ Nouvelle séance ${k === "kine" ? "kiné" : "physique"}</button>
-  ${l.map(s => { const p = D.paliers.find(x => x.id === s.palier_id);
+  ${l.map(s => { const ps = (s.paliers?.length ? s.paliers : [s.palier_id]).map(i => D.paliers.find(x => x.id === i)).filter(Boolean);
     return `<div class="carte seance" data-a="seance" data-id="${s.id}"><div class="ent"><b class="serif">${fmt(s.date, LONG)}</b><small>${s.duree ? s.duree + " min" : ""}</small></div>
-      <small>${[s.intervenant, p && "Palier " + p.code].filter(Boolean).map(esc).join(" · ")}</small>${s.objectifs ? `<p><b>Objectifs :</b> ${esc(s.objectifs)}</p>` : ""}${s.exercices ? `<p>${esc(s.exercices)}</p>` : ""}${s.consignes ? `<p><b>Consignes :</b> ${esc(s.consignes)}</p>` : ""}
+      <small>${esc(s.intervenant || "")}</small>${ps.length || s.capacites?.length ? `<div class="indic">${ps.map(p => `<span class="chip ${p.statut === "valide" ? "fait" : ""}">${man(p.code)} ${esc(p.nom)}</span>`).join("")}${(s.capacites || []).map(c => `<span class="chip">${L.cap[c] || c}</span>`).join("")}</div>` : ""}${s.objectifs ? `<p><b>Objectifs :</b> ${esc(s.objectifs)}</p>` : ""}${s.exercices ? `<p>${esc(s.exercices)}</p>` : ""}${s.consignes ? `<p><b>Consignes :</b> ${esc(s.consignes)}</p>` : ""}
       <div class="indic">${s.rpe != null && k === "physique" ? `<span class="chip">RPE ${s.rpe}/10</span>` : ""}${s.douleur != null ? `<span class="chip">Douleur ${s.douleur}/10</span>` : ""}${s.gonflement != null ? `<span class="chip">Gonflement ${s.gonflement}/10</span>` : ""}${s.ressenti ? `<span class="chip">${esc(s.ressenti)}</span>` : ""}</div></div>`; }).join("") || `<p class="vide">Aucune séance enregistrée.</p>`}`;
 };
 
@@ -615,6 +662,7 @@ VUES.carnet = () => {
 const champ = (c, v) => { const l = `<label>${c.l}</label>`, n = `name="${c.k}"`, cl = c.plein || ["textarea","range","check"].includes(c.t) ? "plein" : "";
   if (c.t === "select") return `<div class="${cl}">${l}<select ${n}>${c.o.map(([k, t]) => `<option value="${esc(k)}"${String(k) === String(v ?? "") ? " selected" : ""}>${esc(t)}</option>`).join("")}</select></div>`;
   if (c.t === "textarea") return `<div class="plein">${l}<textarea ${n} rows="${c.rows || 2}" placeholder="${esc(c.ph || "")}">${esc(v)}</textarea></div>`;
+  if (c.t === "multi") return `<div class="plein">${l}<div class="puces">${c.o.map(([k, t]) => `<label class="puce"><input type="checkbox" ${n} value="${esc(k)}"${(v || []).includes(k) ? " checked" : ""}><span>${esc(t)}</span></label>`).join("") || `<small>—</small>`}</div></div>`;
   if (c.t === "check") return `<div class="plein"><label class="coche"><input type="checkbox" ${n}${v ? " checked" : ""}> ${c.l}</label></div>`;
   if (c.t === "range") return `<div class="plein">${l}<div class="curseur"><input type="range" min="0" max="10" ${n} value="${v ?? 0}" oninput="this.nextElementSibling.value=this.value"><output>${v ?? 0}</output></div></div>`;
   return `<div class="${cl}">${l}<input type="${c.t || "text"}" ${n} value="${esc(c.t === "time" ? hh(v) : v)}"${c.t === "number" ? ' step="any"' : ""}${c.req ? " required" : ""} placeholder="${esc(c.ph || "")}"></div>`; };
@@ -624,7 +672,7 @@ const formulaire = (t, champs, v = {}, {intro = "", extras = []} = {}) => new Pr
     <div class="acts">${extras.map(([k, l, cl]) => `<button value="${k}" class="${cl || "sec"}" formnovalidate>${l}</button>`).join("")}<span class="sp"></span><button value="annuler" formnovalidate>Annuler</button><button value="ok" class="prim">Enregistrer</button></div></form>`;
   // Ignore l'événement de fermeture d'une boîte précédente (la boîte est déjà rouverte)
   d.onclose = () => { if (d.open) return; d.onclose = null; const b = d.returnValue; if (!b || b === "annuler") return res(null);
-    const r = {_b:b}; champs.forEach(c => { const el = d.querySelector(`[name="${c.k}"]`); r[c.k] = c.t === "check" ? el.checked : el.value === "" ? null : ["number","range"].includes(c.t) ? +el.value : el.value; }); res(r); };
+    const r = {_b:b}; champs.forEach(c => { if (c.t === "multi") return r[c.k] = [...d.querySelectorAll(`[name="${c.k}"]:checked`)].map(e => e.value); const el = d.querySelector(`[name="${c.k}"]`); r[c.k] = c.t === "check" ? el.checked : el.value === "" ? null : ["number","range"].includes(c.t) ? +el.value : el.value; }); res(r); };
   d.returnValue = ""; d.showModal();
 });
 const sans_b = r => { const {_b, ...x} = r; return x; };
@@ -639,7 +687,7 @@ const A = {
   mois: id => { const m = new Date(U.mois + "T12:00"); m.setMonth(m.getMonth() + +id); U.mois = iso(m).slice(0, 8) + "01"; rendre(); },
   semaine: id => { U.jour = addJ(U.jour, +id); rendre(); },
   jour: id => { U.jour = id; rendre(); },
-  chapitre: id => { const o = U.ouvert == null ? phaseClin().id === id : U.ouvert === id; U.ouvert = o ? "" : id; rendre(); },
+  chapitre: id => { U.ouvert = U.ouvert === id ? "" : id; rendre(); },
 
   // ----- Quêtes -----
   qPlus: async id => { const [qid, d] = id.split("|"), q = quete(qid), x = qj(q, d) || {valeur:0, statut:"en_cours"}, v = +x.valeur + pas(q);
@@ -704,17 +752,27 @@ const A = {
     if (f && ["kine","physique"].includes(e.type) && !D.seances.some(s => s.date === e.date && s.type === e.type) && confirm("Enregistrer le contenu de cette séance ?")) A.seance(`new:${e.type}:${e.date}:${e.professionnel || ""}`); },
 
   // ----- Séances et préparation physique -----
-  seance: async id => { const nv = id.startsWith("new"), [, t, d, p] = id.split(":"), s = nv ? {type:t, date:d || auj(), intervenant:p || "", palier_id:palActif()?.id} : D.seances.find(x => x.id === id), k = s.type === "kine";
+  seance: async id => { const nv = id.startsWith("new"), [, t, d, p] = id.split(":"), pa = palActif(), pc = phaseClin();
+    const s = nv ? {type:t, date:d || auj(), intervenant:p || "", paliers:pa ? [pa.id] : [], capacites:[]} : D.seances.find(x => x.id === id), k = s.type === "kine";
+    // Manches proposées : étape en cours, étape suivante et manches déjà cochées
+    const prop = D.paliers.filter(x => [pc.numero, pc.numero + 1].includes(phase(x.phase_id).numero) || (s.paliers || []).includes(x.id));
     const r = await formulaire(`${nv ? "Nouvelle séance" : "Séance"} ${k ? "kiné" : "physique"}`, [{k:"date", l:"Date", t:"date", req:1}, {k:"duree", l:"Durée (min)", t:"number"},
-      {k:"intervenant", l:k ? "Kiné" : "Encadrant"}, {k:"palier_id", l:"Palier", t:"select", o:[["","—"], ...D.paliers.map(x => [x.id, `${man(x.code)} · ${x.nom}`])]},
+      {k:"intervenant", l:k ? "Kiné" : "Encadrant", plein:1}, {k:"paliers", l:"Manches travaillées", t:"multi", o:prop.map(x => [x.id, `${man(x.code)} ${x.nom}${x.statut === "valide" ? " ✓" : ""}`])},
+      {k:"capacites", l:"Capacités travaillées", t:"multi", o:opts(L.cap)},
       {k:"objectifs", l:k ? "Objectifs" : "Type / objectif", t:"textarea"}, {k:"exercices", l:"Exercices, séries, répétitions, charges", t:"textarea", rows:4, ph:"Un exercice par ligne : 3 × 10 · 20 kg"},
       ...(k ? [{k:"mesures", l:"Mesures cliniques", t:"textarea", ph:"Flexion 95°, extension -2°…"}] : [{k:"rpe", l:"RPE (effort perçu)", t:"range"}]),
       {k:"douleur", l:"Douleur", t:"range"}, {k:"gonflement", l:k ? "Gonflement" : "Réaction du genou (gonflement)", t:"range"}, {k:"ressenti", l:"Ressenti"},
-      {k:"commentaire", l:"Commentaires", t:"textarea"}, ...(k ? [{k:"consignes", l:"Nouvelles consignes / objectifs suivants", t:"textarea"}] : [])], s, {extras:nv ? [] : SUPPR});
+      {k:"commentaire", l:"Commentaires", t:"textarea"}, ...(k ? [{k:"consignes", l:"Nouvelles consignes / objectifs suivants", t:"textarea"}] : [])], s,
+      {extras:nv ? [] : [["bilan","Bilan des manches"], ...SUPPR]});
     if (!r) return;
-    if (r._b === "suppr") { if (!confirm("Supprimer cette séance ?")) return; ok(await sb.from("seances").delete().eq("id", id)); }
-    else { const x = {...sans_b(r), type:s.type}; ok(nv ? await sb.from("seances").insert(x) : await sb.from("seances").update(x).eq("id", id)); }
-    await maj(); },
+    if (r._b === "bilan") return ouvrirBilan(s.paliers || []);
+    if (r._b === "suppr") { if (!confirm("Supprimer cette séance ?")) return; ok(await sb.from("seances").delete().eq("id", id)); return maj(); }
+    const x = {...sans_b(r), type:s.type, palier_id:r.paliers[0] || null};
+    ok(nv ? await sb.from("seances").insert(x) : await sb.from("seances").update(x).eq("id", id));
+    await maj();
+    // Après la séance : cocher les critères et valider les manches travaillées
+    if (r.paliers.length) ouvrirBilan(r.paliers); },
+  bilan: id => ouvrirBilan(D.seances.find(x => x.id === id)?.paliers || []),
   objectif: async id => { const nv = id === "new", o = nv ? {capacite:"force", phase_id:phaseClin().id, source:"patient"} : D.objectifs_physiques.find(x => x.id === id);
     const r = await formulaire(nv ? "Nouvel objectif physique" : "Objectif physique", [{k:"capacite", l:"Capacité", t:"select", o:opts(L.cap)}, {k:"phase_id", l:"Étape", t:"select", o:D.phases.map(p => [p.id, `${p.numero}. ${p.nom}`])},
       {k:"libelle", l:"Objectif", req:1, plein:1}, {k:"cible", l:"Cible", ph:"3 × 12 à 20 kg…"}, {k:"source", l:"Saisie", t:"select", o:opts(L.src)}, {k:"valide", l:"Objectif validé", t:"check"}], o, {extras:nv ? [] : SUPPR});
@@ -733,27 +791,33 @@ const A = {
   palierEdit: async id => { const p = D.paliers.find(x => x.id === id);
     const r = await formulaire(`Manche ${man(p.code)}`, [{k:"nom", l:"Nom", req:1, plein:1}, {k:"objectifs", l:"Objectifs", t:"textarea"}, {k:"date_min", l:"Date minimale éventuelle", t:"date"}, {k:"prolonge", l:"Palier prolongé par le kiné", t:"check"},
       {k:"motif", l:"Motif / décision du kiné", t:"textarea"}], {...p, motif:""});
-    if (!r) return; ok(await sb.from("paliers").update(sans_b(r)).eq("id", id)); await maj(); ouvrirPalier(id); },
+    if (!r) return U.ctx?.(); ok(await sb.from("paliers").update(sans_b(r)).eq("id", id)); await maj(); U.ctx?.(); },
   palierSuspendre: async id => { const p = D.paliers.find(x => x.id === id), s = p.statut === "suspendu";
     const motif = prompt(s ? "Reprise de la progression — commentaire :" : "Motif de la suspension (décision du kiné) :", ""); if (motif === null) return;
-    ok(await sb.from("paliers").update({statut:s ? "actif" : "suspendu", motif}).eq("id", id)); await maj(); ouvrirPalier(id); },
-  palierValider: async id => { const p = D.paliers.find(x => x.id === id), ph = phase(p.phase_id);
-    const r = await formulaire(`Valider le manche ${man(p.code)}`, [{k:"validateur", l:"Professionnel validateur", req:1, plein:1}, {k:"date_validation", l:"Date de validation", t:"date", req:1},
-      {k:"motif", l:"Commentaire du professionnel", t:"textarea"}, {k:"confirme", l:"Cette validation a été donnée par le professionnel compétent lors d'une évaluation.", t:"check"}], {date_validation:auj()});
-    if (!r) return; if (!r.confirme) return toast("La validation d'un palier doit venir du professionnel.", true);
-    ok(await sb.from("paliers").update({statut:"valide", validateur:r.validateur, date_validation:r.date_validation, motif:r.motif || "Palier validé"}).eq("id", id));
-    await maj(); const nx = palActif();
-    if (nx && nx.phase_id !== ph.id) { const n = phase(nx.phase_id); U.ouvert = null; celebrer(`Étape ${n.numero} : ${n.nom}`, `Nouvelle étape débloquée !`, ICO_PHASE[n.numero - 1] || "✦"); }
-    else celebrer(`Manche ${man(p.code)} gagnée`, `${p.nom} · palier validé`, "✦"); },
+    ok(await sb.from("paliers").update({statut:s ? "actif" : "suspendu", motif}).eq("id", id)); await maj(); U.ctx?.(); },
+  palierValider: async id => { const p = D.paliers.find(x => x.id === id), ph = phase(p.phase_id), bl = blocages(p), kine = D.seances.filter(x => x.type === "kine" && x.intervenant).at(-1)?.intervenant;
+    const r = await formulaire(`Valider la manche ${man(p.code)}`, [{k:"date_validation", l:"Date", t:"date", req:1}, {k:"validateur", l:"Validée avec", ph:"Mon kiné, moi…"}, {k:"motif", l:"Commentaire", t:"textarea"}],
+      {date_validation:auj(), validateur:kine || ""}, {intro:`<p style="font-size:.9rem;margin:-.2rem 0 .8rem"><b>${esc(p.nom)}</b></p>${bl.length ? `<div class="bloc-valid" style="margin:0 0 .8rem"><b>Pas encore rempli :</b><ul>${bl.map(b => `<li>${esc(b)}</li>`).join("")}</ul><p class="note">Tu peux valider quand même si tu estimes la manche acquise.</p></div>` : ""}`});
+    if (!r) return U.ctx?.();
+    ok(await sb.from("paliers").update({statut:"valide", validateur:r.validateur, date_validation:r.date_validation, motif:r.motif || "Manche validée"}).eq("id", id));
+    await maj();
+    if (phaseValidee(ph)) { U.ouvert = null; celebrer(`Étape ${ph.numero} terminée`, ph.numero < D.phases.length ? `Étape ${ph.numero + 1} débloquée !` : "Parcours complet !", ICO_PHASE[ph.numero - 1] || "✦", () => U.ctx?.()); }
+    else celebrer(`Manche ${man(p.code)} gagnée`, p.nom, "✦", () => U.ctx?.()); },
+  palierAnnuler: async id => { const p = D.paliers.find(x => x.id === id);
+    if (!confirm(`Annuler la validation de la manche ${man(p.code)} ?`)) return U.ctx?.();
+    ok(await sb.from("paliers").update({statut:"verrouille", motif:"Validation annulée"}).eq("id", id)); await maj(); U.ctx?.(); },
+  critToggle: async id => { const c = D.criteres.find(x => x.id === id), on = critOK(c);
+    ok(await sb.from("criteres").update(on ? {statut:"non_evalue", date_eval:null} : {statut:"atteint", date_eval:auj()}).eq("id", id));
+    await maj(); if ($("#dlg").open) U.ctx?.(); },
   critere: async id => { const nv = id.startsWith("new"), c = nv ? {palier_id:id.split(":")[1], obligatoire:true, statut:"non_evalue", source:"kine"} : D.criteres.find(x => x.id === id);
     const r = await formulaire(nv ? "Nouveau critère" : "Critère clinique", [{k:"nom", l:"Critère", req:1, plein:1}, {k:"methode", l:"Méthode d'évaluation", plein:1}, {k:"cible", l:"Valeur cible"}, {k:"unite", l:"Unité"},
       {k:"statut", l:"Statut", t:"select", o:opts(L.crit)}, {k:"valeur", l:"Valeur mesurée"}, {k:"date_eval", l:"Date d'évaluation", t:"date"}, {k:"auteur", l:"Évalué par"},
       {k:"source", l:"Type de saisie", t:"select", o:opts(L.src)}, {k:"obligatoire", l:"Critère obligatoire pour le passage", t:"check"}, {k:"commentaire", l:"Commentaire", t:"textarea"},
       ...(nv ? [] : [{k:"motif", l:"Motif de la modification", t:"textarea"}])], {...c, motif:""}, {extras:nv ? [] : SUPPR});
-    if (!r) return ouvrirPalier(c.palier_id);
+    if (!r) return U.ctx?.();
     if (r._b === "suppr") ok(await sb.from("criteres").delete().eq("id", id));
     else { const x = sans_b(r); if (x.statut !== "non_evalue" && !x.date_eval) x.date_eval = auj(); ok(nv ? await sb.from("criteres").insert({...x, palier_id:c.palier_id}) : await sb.from("criteres").update(x).eq("id", id)); }
-    await maj(); ouvrirPalier(c.palier_id); },
+    await maj(); U.ctx?.(); },
   mesure: async id => { const nv = id === "new", m = nv ? {type:"flexion", date:auj(), source:"patient"} : D.mesures.find(x => x.id === id);
     const r = await formulaire(nv ? "Nouvelle mesure" : "Mesure", [{k:"type", l:"Mesure", t:"select", o:opts(L.mes)}, {k:"valeur", l:"Valeur", t:"number", req:1}, {k:"unite", l:"Unité (vide = automatique)"},
       {k:"date", l:"Date", t:"date", req:1}, {k:"methode", l:"Méthode", ph:"Goniomètre, mètre ruban…"}, {k:"source", l:"Saisie", t:"select", o:opts(L.src)}, {k:"commentaire", l:"Commentaire", t:"textarea"}], m, {extras:nv ? [] : SUPPR});
@@ -790,7 +854,9 @@ const A = {
     const a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = `rebuild_export_${auj()}.json`; a.click(); }
 };
 document.addEventListener("click", async e => { const t = e.target.closest("[data-a]"); if (!t || t.disabled || !A[t.dataset.a]) return;
-  if (t.closest("dialog") && !["fermer"].includes(t.dataset.a)) $("#dlg").close();
+  if (!t.closest("dialog")) U.ctx = null;
+  else if (t.dataset.a === "fermer") U.ctx = null;
+  else if (t.dataset.a !== "critToggle") $("#dlg").close();
   try { await A[t.dataset.a](t.dataset.id, t); } catch (err) { console.error(err); } });
 
 // Enregistrement d'une quête pour un jour donné (LP attribués côté base, une seule fois)
@@ -810,18 +876,29 @@ const regenerer = async s => {
 // ----- Fiche palier -----
 const ouvrirPalier = id => {
   const p = D.paliers.find(x => x.id === id), cr = critsDe(p), bl = blocages(p), d = $("#dlg"), ph = phase(p.phase_id);
-  d.onclose = null;
-  d.innerHTML = `<div class="dlg-in"><small>Étape ${ph.numero} · manche ${man(p.code)} · ${L.pal[p.statut]}${p.prolonge ? " · prolongé" : ""}</small><h3>${esc(p.nom)}</h3>
-    ${p.objectifs ? `<p style="font-size:.9rem">${esc(p.objectifs)}</p>` : ""}${p.date_min ? `<p class="note">Date minimale : ${fmt(p.date_min, LONG)}</p>` : ""}
-    ${p.statut === "valide" ? `<p class="ok"><span class="tampon">Gagnée</span> le ${fmt(p.date_validation, LONG)} par ${esc(p.validateur)}</p>` : ""}${p.motif ? `<p class="note">${esc(p.motif)}</p>` : ""}
-    <h4>Critères cliniques ${cr.length ? `· ${cr.filter(critOK).length} / ${cr.length}` : ""}</h4>
-    ${cr.map(c => `<button class="crit ${c.statut}" data-a="critere" data-id="${c.id}"><span class="pastille"></span><span><b>${esc(c.nom)}</b><small>${[c.methode, c.cible && `cible ${c.cible}${c.unite || ""}`, c.valeur && `mesuré ${c.valeur}${c.unite || ""}`, c.date_eval && fmt(c.date_eval), !c.obligatoire && "facultatif"].filter(Boolean).map(esc).join(" · ")}</small></span>
-      <em>${L.crit[c.statut]}${c.statut !== "non_evalue" ? (c.source === "kine" ? " · kiné" : " · patient") : ""}</em></button>`).join("") || `<p class="vide">Aucun critère : ton kiné définit les critères de ce palier.</p>`}
+  d.onclose = null; U.ctx = () => ouvrirPalier(id);
+  d.innerHTML = `<div class="dlg-in"><small>Étape ${ph.numero} · manche ${man(p.code)} · ${L.pal[p.statut]}${p.prolonge ? " · prolongée" : ""}</small>
+    <div class="f-tete"><span class="hex grand">${p.statut === "valide" ? "✓" : man(p.code)}</span><div><h3>${esc(p.nom)}</h3>${p.objectifs ? `<p>${esc(p.objectifs)}</p>` : ""}</div></div>
+    ${p.date_min ? `<p class="note">Date minimale : ${fmt(p.date_min, LONG)}</p>` : ""}
+    ${p.statut === "valide" ? `<p class="ok"><span class="tampon">Gagnée</span> le ${fmt(p.date_validation, LONG)}${p.validateur ? " · " + esc(p.validateur) : ""}</p>` : ""}${p.motif ? `<p class="note">${esc(p.motif)}</p>` : ""}
+    <h4>Critères ${cr.length ? `· ${cr.filter(critOK).length} / ${cr.length}` : ""}</h4>
+    ${cr.map(ligneCrit).join("") || `<p class="vide">Aucun critère : ajoute ceux que te donne ton kiné.</p>`}
     <button class="lien" style="margin-top:.6rem" data-a="critere" data-id="new:${p.id}">+ Ajouter un critère</button>
-    ${["actif","suspendu"].includes(p.statut) ? `<div class="bloc-valid">${bl.length ? `<b>Conditions de passage restantes</b><ul>${bl.map(b => `<li>${esc(b)}</li>`).join("")}</ul>` : `<b>Toutes les conditions sont réunies.</b> La validation revient au professionnel.`}<p class="note">Ni le temps écoulé ni les LP ne débloquent un palier.</p></div>` : ""}
+    ${p.statut !== "valide" && bl.length ? `<div class="bloc-valid"><b>Encore à travailler</b><ul>${bl.map(b => `<li>${esc(b)}</li>`).join("")}</ul><p class="note">Tu peux valider la manche quand tu l'estimes acquise, idéalement avec ton kiné.</p></div>` : ""}
     <div class="acts"><button class="sec" data-a="palierEdit" data-id="${p.id}">✎ Modifier</button>${p.statut === "actif" ? `<button class="sec" data-a="palierSuspendre" data-id="${p.id}">Suspendre</button>` : p.statut === "suspendu" ? `<button class="sec" data-a="palierSuspendre" data-id="${p.id}">Reprendre</button>` : ""}
-      <span class="sp"></span><button data-a="fermer">Fermer</button>${p.statut === "actif" ? `<button class="prim" data-a="palierValider" data-id="${p.id}"${bl.length ? " disabled" : ""}>Valider</button>` : ""}</div></div>`;
-  d.showModal();
+      <span class="sp"></span><button data-a="fermer">Fermer</button>${p.statut === "valide" ? `<button class="sec" data-a="palierAnnuler" data-id="${p.id}">Annuler la validation</button>` : `<button class="prim" data-a="palierValider" data-id="${p.id}">Valider</button>`}</div></div>`;
+  if (!d.open) d.showModal();
+};
+// ----- Bilan de séance : critères et manches travaillés pendant la séance -----
+const ouvrirBilan = (ids, titre = "Bilan de séance") => {
+  const d = $("#dlg"), ps = ids.map(i => D.paliers.find(p => p.id === i)).filter(Boolean).sort((a, b) => a.ordre - b.ordre);
+  d.onclose = null; U.ctx = () => ouvrirBilan(ids, titre);
+  d.innerHTML = `<div class="dlg-in"><h3>${titre}</h3><p class="note" style="margin-top:-.3rem">Coche les critères atteints aujourd'hui et valide les manches acquises.</p>
+    ${ps.map(p => { const cr = critsDe(p); return `<div class="bilan-p"><div class="f-tete"><span class="hex">${p.statut === "valide" ? "✓" : man(p.code)}</span><div><h3 style="font-size:1.05rem">${esc(p.nom)}</h3><p>${cr.filter(critOK).length} / ${cr.length} critères · ${L.pal[p.statut]}</p></div>
+      ${p.statut === "valide" ? `<span class="tampon">Gagnée</span>` : `<button class="prim" style="padding:.4rem .7rem;font-size:.75rem" data-a="palierValider" data-id="${p.id}">Valider</button>`}</div>
+      ${cr.map(ligneCrit).join("") || `<p class="vide">Aucun critère.</p>`}<button class="lien" style="font-size:.78rem" data-a="critere" data-id="new:${p.id}">+ Critère</button></div>`; }).join("") || `<p class="vide">Aucune manche sélectionnée.</p>`}
+    <div class="acts"><span class="sp"></span><button class="prim" data-a="fermer">Terminer</button></div></div>`;
+  if (!d.open) d.showModal();
 };
 
 // ===== Authentification et démarrage =====
